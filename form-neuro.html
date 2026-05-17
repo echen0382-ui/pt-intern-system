@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>神經站整合式評核表單 — PT實習通</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal:#0E7C7B;--teal-light:#1AA0A0;--teal-dark:#075E5E;
+  --cream:#F7F4EF;--warm:#FDFCFA;--charcoal:#1C2B2B;
+  --slate:#3D5555;--muted:#7A9090;
+  --accent:#E8A04A;--accent-bg:#FDF0DC;
+  --red:#D0575A;--red-bg:#FCE8E8;
+  --green:#2E9E6B;--green-bg:#E3F5ED;
+  --purple:#6B4FA0;--purple-bg:#F0EBF8;
+  --border:rgba(14,124,123,0.13);
+  --lv1a:#C0392B;--lv1b:#E74C3C;
+  --lv2a:#D35400;--lv2b:#E67E22;
+  --lv3a:#B7950B;--lv3b:#D4AC0D;--lv3c:#F1C40F;
+  --lv4a:#1E8449;--lv4b:#27AE60;
+  --lv5:#8E44AD;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--cream);color:var(--charcoal);display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--charcoal);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-logo{padding:16px 14px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.sb-logo-icon{width:30px;height:30px;background:var(--teal);border-radius:7px;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:12px;font-family:'DM Serif Display',serif;}
+.sb-logo-text{color:white;font-family:'Noto Serif TC',serif;font-weight:900;font-size:14px;letter-spacing:2px;}
+.sb-station{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.sb-station-badge{display:inline-block;background:rgba(14,124,123,0.3);color:var(--teal-light);font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;margin-bottom:6px;letter-spacing:1px;}
+.sb-station-title{color:white;font-family:'Noto Serif TC',serif;font-weight:900;font-size:13px;line-height:1.4;}
+.sb-nav{padding:10px 8px;flex:1;}
+.sb-section-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);padding:0 6px;margin:10px 0 4px;}
+.sb-item{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:7px;color:rgba(255,255,255,0.45);font-size:11px;cursor:pointer;transition:all .15s;margin-bottom:1px;text-decoration:none;}
+.sb-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85);}
+.sb-item.active{background:rgba(14,124,123,0.3);color:white;}
+.sb-item.done{color:rgba(255,255,255,0.6);}
+.sb-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.15);flex-shrink:0;transition:background .15s;}
+.sb-item.active .sb-dot{background:var(--teal-light);}
+.sb-item.done .sb-dot{background:var(--green);}
+.sb-module-tag{font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:auto;}
+.tag-epa{background:rgba(14,124,123,0.25);color:var(--teal-light);}
+.tag-cex{background:rgba(107,79,160,0.25);color:#b39ddb;}
+.tag-cbd{background:rgba(232,160,74,0.25);color:#f5c98a;}
+.sb-progress{padding:12px 14px;border-top:1px solid rgba(255,255,255,0.08);}
+.sb-prog-label{font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:6px;display:flex;justify-content:space-between;}
+.sb-prog-bar{height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;}
+.sb-prog-fill{height:100%;background:var(--teal-light);border-radius:2px;transition:width .4s;}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:white;border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;flex-shrink:0;}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.topbar-bc{font-size:12px;color:var(--muted);}
+.topbar-bc strong{color:var(--charcoal);}
+.mode-pills{display:flex;gap:4px;}
+.mode-pill{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .18s;font-family:inherit;}
+.mode-pill.supervisor{background:rgba(14,124,123,0.1);color:var(--teal-dark);}
+.mode-pill.supervisor.active{background:var(--teal);color:white;}
+.mode-pill.student{background:rgba(107,79,160,0.08);color:var(--purple);}
+.mode-pill.student.active{background:var(--purple);color:white;}
+.topbar-right{display:flex;gap:8px;}
+.btn{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:none;transition:all .18s;display:inline-flex;align-items:center;gap:5px;}
+.btn-ghost{background:transparent;color:var(--slate);border:1.5px solid var(--border);}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal);}
+.btn-save{background:var(--accent-bg);color:#8a5a10;border:1px solid rgba(232,160,74,0.3);}
+.btn-submit{background:var(--teal);color:white;}
+.btn-submit:hover{background:var(--teal-dark);}
+
+.content{padding:24px 28px 80px;max-width:820px;}
+
+/* MODULE SELECTOR */
+.module-selector{background:white;border-radius:14px;border:1px solid var(--border);padding:20px 22px;margin-bottom:18px;}
+.module-sel-title{font-weight:700;font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.module-sel-title span{font-size:12px;color:var(--muted);font-weight:400;}
+.module-options{display:flex;gap:10px;flex-wrap:wrap;}
+.module-opt{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;transition:all .18s;flex:1;min-width:180px;}
+.module-opt:hover{border-color:var(--teal);}
+.module-opt.required{border-color:rgba(14,124,123,0.4);background:rgba(14,124,123,0.04);}
+.module-opt.selected{border-color:var(--purple);background:var(--purple-bg);}
+.module-opt-icon{font-size:20px;flex-shrink:0;}
+.module-opt-info{}
+.module-opt-name{font-weight:700;font-size:13px;color:var(--charcoal);}
+.module-opt-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.module-opt-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;margin-top:4px;display:inline-block;}
+.badge-required{background:rgba(14,124,123,0.12);color:var(--teal-dark);}
+.badge-optional{background:var(--purple-bg);color:var(--purple);}
+.module-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin-left:auto;flex-shrink:0;transition:all .18s;}
+.module-opt.selected .module-check{background:var(--purple);border-color:var(--purple);color:white;font-size:11px;}
+.module-opt.required .module-check{background:var(--teal);border-color:var(--teal);color:white;font-size:11px;}
+
+/* CARD */
+.card{background:white;border-radius:14px;border:1px solid var(--border);margin-bottom:14px;overflow:hidden;}
+.card-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.card-module-stripe{width:4px;height:36px;border-radius:2px;flex-shrink:0;}
+.stripe-epa{background:var(--teal);}
+.stripe-cex{background:var(--purple);}
+.stripe-cbd{background:var(--accent);}
+.stripe-shared{background:var(--green);}
+.card-header-info{flex:1;}
+.card-header-title{font-weight:700;font-size:14px;color:var(--charcoal);}
+.card-header-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.card-module-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;}
+.badge-epa{background:rgba(14,124,123,0.1);color:var(--teal-dark);}
+.badge-cex{background:var(--purple-bg);color:var(--purple);}
+.badge-cbd{background:var(--accent-bg);color:#8a5a10;}
+.badge-shared{background:var(--green-bg);color:#1a6b40;}
+.card-body{padding:18px 20px;}
+
+/* META GRID */
+.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.meta-field{}
+.meta-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:4px;text-transform:uppercase;}
+.meta-input{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;color:var(--charcoal);background:var(--cream);font-family:inherit;transition:border-color .18s;}
+.meta-input:focus{outline:none;border-color:var(--teal);background:white;}
+.meta-cb-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;}
+.meta-cb{display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;}
+.meta-cb input{accent-color:var(--teal);width:13px;height:13px;}
+.meta-fullrow{grid-column:1/-1;}
+.meta-halfrow{grid-column:span 2;}
+
+/* DIAGNOSIS TAGS */
+.diag-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.diag-tag{padding:4px 10px;border-radius:100px;border:1.5px solid var(--border);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--slate);background:white;}
+.diag-tag:hover{border-color:var(--teal);color:var(--teal);}
+.diag-tag.selected{background:var(--teal);border-color:var(--teal);color:white;}
+
+/* INFO BOX */
+.info-box{padding:10px 14px;border-radius:8px;border-left:3px solid;margin-bottom:14px;font-size:12px;line-height:1.6;}
+.info-box.teal{background:rgba(14,124,123,0.06);border-color:var(--teal);color:var(--teal-dark);}
+.info-box.amber{background:var(--accent-bg);border-color:var(--accent);color:#8a5a10;}
+
+/* EPA TRUST SCALE */
+.epa-item{margin-bottom:16px;padding:14px 16px;background:var(--cream);border-radius:10px;border:1px solid var(--border);transition:border-color .18s;}
+.epa-item:hover{border-color:rgba(14,124,123,0.25);}
+.epa-item-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
+.epa-item-num{width:24px;height:24px;border-radius:50%;background:var(--teal);color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.epa-item-text{font-size:13px;color:var(--charcoal);line-height:1.6;flex:1;}
+.epa-item-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;}
+.epa-tag{font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;}
+.epa-tag-1{background:rgba(14,124,123,0.12);color:var(--teal-dark);}
+.epa-tag-2{background:rgba(107,79,160,0.12);color:var(--purple);}
+.epa-tag-3{background:rgba(232,160,74,0.2);color:#8a5a10;}
+
+/* TRUST LEVEL SELECTOR */
+.trust-scale{display:flex;gap:4px;flex-wrap:wrap;}
+.trust-btn{padding:5px 0;border-radius:7px;border:1.5px solid;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;flex:1;min-width:44px;background:white;display:flex;flex-direction:column;align-items:center;gap:1px;}
+.trust-btn .lv-code{font-size:12px;font-weight:900;font-family:'DM Serif Display',serif;}
+.trust-btn .lv-desc{font-size:9px;line-height:1.2;opacity:.8;}
+.trust-btn.lv1a{border-color:rgba(192,57,43,0.3);color:var(--lv1a);}
+.trust-btn.lv1b{border-color:rgba(231,76,60,0.3);color:var(--lv1b);}
+.trust-btn.lv2a{border-color:rgba(211,84,0,0.3);color:var(--lv2a);}
+.trust-btn.lv2b{border-color:rgba(230,126,34,0.3);color:var(--lv2b);}
+.trust-btn.lv3a{border-color:rgba(183,149,11,0.3);color:var(--lv3a);}
+.trust-btn.lv3b{border-color:rgba(212,172,13,0.3);color:var(--lv3b);}
+.trust-btn.lv3c{border-color:rgba(241,196,15,0.4);color:#a08a00;}
+.trust-btn.lv4a{border-color:rgba(30,132,73,0.3);color:var(--lv4a);}
+.trust-btn.lv4b{border-color:rgba(39,174,96,0.3);color:var(--lv4b);}
+.trust-btn.lv5{border-color:rgba(142,68,173,0.3);color:var(--lv5);}
+.trust-btn.lv1a.sel{background:var(--lv1a);border-color:var(--lv1a);color:white;}
+.trust-btn.lv1b.sel{background:var(--lv1b);border-color:var(--lv1b);color:white;}
+.trust-btn.lv2a.sel{background:var(--lv2a);border-color:var(--lv2a);color:white;}
+.trust-btn.lv2b.sel{background:var(--lv2b);border-color:var(--lv2b);color:white;}
+.trust-btn.lv3a.sel{background:var(--lv3a);border-color:var(--lv3a);color:white;}
+.trust-btn.lv3b.sel{background:var(--lv3b);border-color:var(--lv3b);color:white;}
+.trust-btn.lv3c.sel{background:#d4b800;border-color:#d4b800;color:white;}
+.trust-btn.lv4a.sel{background:var(--lv4a);border-color:var(--lv4a);color:white;}
+.trust-btn.lv4b.sel{background:var(--lv4b);border-color:var(--lv4b);color:white;}
+.trust-btn.lv5.sel{background:var(--lv5);border-color:var(--lv5);color:white;}
+.trust-na{padding:5px 8px;border-radius:7px;border:1.5px solid var(--border);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);background:white;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.trust-na.active{background:var(--muted);border-color:var(--muted);color:white;}
+
+/* EPA SUMMARY ROW */
+.epa-group-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:10px;cursor:pointer;}
+.epa-group-header.epa1{background:rgba(14,124,123,0.08);}
+.epa-group-header.epa2{background:rgba(107,79,160,0.08);}
+.epa-group-header.epa3{background:rgba(232,160,74,0.12);}
+.epa-group-label{font-weight:700;font-size:13px;flex:1;}
+.epa-group-header.epa1 .epa-group-label{color:var(--teal-dark);}
+.epa-group-header.epa2 .epa-group-label{color:var(--purple);}
+.epa-group-header.epa3 .epa-group-label{color:#8a5a10;}
+.epa-group-count{font-size:11px;font-weight:600;padding:2px 8px;border-radius:100px;}
+.epa-group-header.epa1 .epa-group-count{background:rgba(14,124,123,0.15);color:var(--teal-dark);}
+.epa-group-header.epa2 .epa-group-count{background:rgba(107,79,160,0.12);color:var(--purple);}
+.epa-group-header.epa3 .epa-group-count{background:rgba(232,160,74,0.2);color:#8a5a10;}
+
+/* MINI-CEX SCORE */
+.cex-item{margin-bottom:14px;padding:14px 16px;background:var(--cream);border-radius:10px;border:1px solid var(--border);}
+.cex-item-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.cex-num{width:22px;height:22px;border-radius:50%;background:var(--purple);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cex-title{font-weight:700;font-size:13px;flex:1;}
+.cex-score-preview{font-family:'DM Serif Display',serif;font-size:18px;color:var(--muted);}
+.cex-score-preview.scored{color:var(--purple);}
+.score-scale{display:flex;gap:4px;align-items:center;}
+.score-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);background:white;color:var(--slate);font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Serif Display',serif;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.score-btn:hover{border-color:var(--purple);color:var(--purple);}
+.score-btn.s1,.score-btn.s2,.score-btn.s3{border-color:rgba(208,87,90,0.25);}
+.score-btn.s4,.score-btn.s5,.score-btn.s6{border-color:rgba(232,160,74,0.35);}
+.score-btn.s7,.score-btn.s8,.score-btn.s9{border-color:rgba(46,158,107,0.35);}
+.score-btn.s1.sel,.score-btn.s2.sel,.score-btn.s3.sel{background:var(--red);border-color:var(--red);color:white;}
+.score-btn.s4.sel,.score-btn.s5.sel,.score-btn.s6.sel{background:var(--accent);border-color:var(--accent);color:white;}
+.score-btn.s7.sel,.score-btn.s8.sel,.score-btn.s9.sel{background:var(--green);border-color:var(--green);color:white;}
+.score-divider{width:1px;height:20px;background:var(--border);}
+.cex-na{padding:4px 10px;border-radius:7px;border:1.5px solid var(--border);font-size:11px;font-weight:600;cursor:pointer;color:var(--muted);background:white;font-family:inherit;transition:all .15s;margin-left:4px;}
+.cex-na.active{background:var(--muted);border-color:var(--muted);color:white;}
+.sub-items-cex{margin-bottom:10px;}
+.sub-item{display:flex;gap:8px;padding:5px 0;border-bottom:1px dashed rgba(0,0,0,0.06);}
+.sub-item:last-child{border:none;}
+.sub-n{font-size:10px;font-weight:700;color:var(--muted);width:16px;flex-shrink:0;padding-top:2px;}
+.sub-t{font-size:12px;color:var(--slate);line-height:1.5;}
+
+/* CBD SCORE */
+.cbd-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--cream);border-radius:10px;border:1px solid var(--border);margin-bottom:8px;}
+.cbd-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cbd-title{font-size:13px;font-weight:600;flex:1;}
+.cbd-scale{display:flex;gap:3px;}
+.cbd-btn{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--border);background:white;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Serif Display',serif;transition:all .15s;display:flex;align-items:center;justify-content:center;color:var(--slate);}
+.cbd-btn:hover{border-color:var(--accent);color:var(--accent);}
+.cbd-btn.b1,.cbd-btn.b2{border-color:rgba(208,87,90,0.25);}
+.cbd-btn.b3,.cbd-btn.b4{border-color:rgba(232,160,74,0.3);}
+.cbd-btn.b5,.cbd-btn.b6{border-color:rgba(46,158,107,0.3);}
+.cbd-btn.b1.sel,.cbd-btn.b2.sel{background:var(--red);border-color:var(--red);color:white;}
+.cbd-btn.b3.sel,.cbd-btn.b4.sel{background:var(--accent);border-color:var(--accent);color:white;}
+.cbd-btn.b5.sel,.cbd-btn.b6.sel{background:var(--green);border-color:var(--green);color:white;}
+.cbd-uc{padding:4px 8px;border-radius:6px;border:1.5px solid var(--border);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);background:white;font-family:inherit;transition:all .15s;}
+.cbd-uc.active{background:var(--muted);border-color:var(--muted);color:white;}
+.cbd-score-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);padding:0 2px;margin-top:2px;width:198px;}
+
+/* TECH CONTENT */
+.tech-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.tech-tag{display:flex;align-items:center;gap:5px;padding:5px 8px;border-radius:7px;border:1.5px solid var(--border);font-size:11px;cursor:pointer;transition:all .15s;color:var(--slate);background:white;}
+.tech-tag:hover{border-color:var(--purple);color:var(--purple);}
+.tech-tag.selected{background:var(--purple-bg);border-color:var(--purple);color:var(--purple);font-weight:600;}
+.tech-tag input{accent-color:var(--purple);width:12px;height:12px;cursor:pointer;}
+
+/* FEEDBACK */
+.feedback-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.fb-label{font-size:11px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.fb-label.praise{color:var(--green);}
+.fb-label.improve{color:var(--accent);}
+.fb-label.action{color:var(--charcoal);}
+.fb-label.student{color:var(--purple);}
+textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--charcoal);line-height:1.7;resize:vertical;font-family:inherit;background:var(--cream);transition:border-color .18s;min-height:80px;}
+textarea:focus{outline:none;border-color:var(--teal);background:white;}
+
+/* SATISFACTION */
+.sat-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.sat-label{font-size:12px;color:var(--slate);width:100px;flex-shrink:0;}
+.sat-scale{display:flex;gap:3px;}
+.sat-btn{width:26px;height:26px;border-radius:6px;border:1.5px solid var(--border);background:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;color:var(--muted);}
+.sat-btn:hover{border-color:var(--teal);color:var(--teal);}
+.sat-btn.sel{background:var(--teal);border-color:var(--teal);color:white;}
+
+/* TIME */
+.time-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;}
+.time-field{}
+.time-label{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.time-input-row{display:flex;align-items:center;gap:5px;}
+.time-input{width:56px;padding:7px 8px;border-radius:7px;border:1.5px solid var(--border);font-size:14px;font-weight:700;text-align:center;font-family:'DM Serif Display',serif;color:var(--charcoal);background:var(--cream);}
+.time-input:focus{outline:none;border-color:var(--teal);background:white;}
+.time-unit{font-size:11px;color:var(--muted);}
+.exp-row{display:flex;align-items:center;gap:6px;}
+.exp-btn{width:24px;height:24px;border-radius:6px;border:1.5px solid var(--border);background:white;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--slate);}
+.exp-btn:hover{border-color:var(--teal);color:var(--teal);}
+.exp-num{font-family:'DM Serif Display',serif;font-size:20px;color:var(--teal-dark);width:28px;text-align:center;}
+
+/* SIG */
+.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.sig-label{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+.sig-box{border:1.5px dashed var(--border);border-radius:8px;height:56px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);cursor:pointer;transition:all .18s;background:var(--cream);}
+.sig-box:hover{border-color:var(--teal);}
+.sig-box.signed{border-style:solid;border-color:var(--green);background:var(--green-bg);}
+.sig-signed-text{font-size:12px;color:var(--green);font-weight:700;}
+
+/* FLOAT SUMMARY */
+.float-summary{position:fixed;bottom:20px;right:24px;z-index:50;background:var(--charcoal);border-radius:14px;padding:12px 18px;box-shadow:0 8px 28px rgba(0,0,0,0.2);display:flex;align-items:center;gap:16px;}
+.fs-item{text-align:center;}
+.fs-num{font-family:'DM Serif Display',serif;font-size:20px;color:white;line-height:1;}
+.fs-label{font-size:9px;color:rgba(255,255,255,0.4);margin-top:2px;}
+.fs-divider{width:1px;height:28px;background:rgba(255,255,255,0.1);}
+.fs-btn{padding:7px 14px;background:var(--teal);color:white;border:none;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.fs-btn:hover{background:var(--teal-light);}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(70px);z-index:999;background:var(--charcoal);color:white;padding:10px 18px;border-radius:9px;font-size:12px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,0.2);}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* HIDDEN */
+.hidden{display:none;}
+
+@media(max-width:760px){
+  .sidebar{display:none;}
+  .meta-grid{grid-template-columns:1fr 1fr;}
+  .tech-grid{grid-template-columns:1fr 1fr;}
+  .time-grid{grid-template-columns:1fr 1fr;}
+  .content{padding:14px 14px 80px;}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">PT</div>
+    <span class="sb-logo-text">實習通</span>
+  </div>
+  <div class="sb-station">
+    <div class="sb-station-badge">神經站</div>
+    <div class="sb-station-title">整合式臨床評核表單</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section-label">基本資料</div>
+    <a class="sb-item active" href="#" onclick="scrollTo('meta')"><span class="sb-dot"></span>學員與病患資料</a>
+    <div class="sb-section-label">EPA 主表單</div>
+    <a class="sb-item" href="#" onclick="scrollTo('epa1')"><span class="sb-dot"></span>EPA 評估項目 1–13<span class="sb-module-tag tag-epa">EPA</span></a>
+    <a class="sb-item" href="#" onclick="scrollTo('epa1')"><span class="sb-dot"></span>整體任務評估 14–16<span class="sb-module-tag tag-epa">EPA</span></a>
+    <div class="sb-section-label" id="nav-optional-label">選配模組</div>
+    <a class="sb-item" id="nav-cex" href="#" onclick="scrollTo('cex')"><span class="sb-dot"></span>Mini-CEX 評分<span class="sb-module-tag tag-cex">選配</span></a>
+    <a class="sb-item" id="nav-cbd" href="#" onclick="scrollTo('cbd')"><span class="sb-dot"></span>CbD 案例討論<span class="sb-module-tag tag-cbd">選配</span></a>
+    <div class="sb-section-label">回饋與完成</div>
+    <a class="sb-item" href="#" onclick="scrollTo('tech')"><span class="sb-dot"></span>技術內容勾選</a>
+    <a class="sb-item" href="#" onclick="scrollTo('feedback')"><span class="sb-dot"></span>共用回饋評語</a>
+    <a class="sb-item" href="#" onclick="scrollTo('sat')"><span class="sb-dot"></span>滿意度與時間</a>
+    <a class="sb-item" href="#" onclick="scrollTo('sig')"><span class="sb-dot"></span>簽章確認</a>
+  </div>
+  <div class="sb-progress">
+    <div class="sb-prog-label"><span>填寫進度</span><span id="progPct">0%</span></div>
+    <div class="sb-prog-bar"><div class="sb-prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-bc"><span>神經站</span> <strong>›</strong> <strong>整合式評核表單</strong></div>
+      <div class="mode-pills">
+        <button class="mode-pill supervisor active" onclick="setMode('supervisor',this)">👩‍⚕️ 督導</button>
+        <button class="mode-pill student" onclick="setMode('student',this)">🎓 學員</button>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost" onclick="saveDraft()">💾 暫存</button>
+      <button class="btn btn-submit" onclick="submitForm()">✓ 送出評核</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- MODULE SELECTOR -->
+    <div class="module-selector">
+      <div class="module-sel-title">選擇本次評核模組 <span>EPA 為必填，Mini-CEX 與 CbD 可視情況選配</span></div>
+      <div class="module-options">
+        <div class="module-opt required">
+          <div class="module-opt-icon">📋</div>
+          <div class="module-opt-info">
+            <div class="module-opt-name">EPA 神經物理治療</div>
+            <div class="module-opt-sub">信賴等級 Lv1–5 · 16題</div>
+            <div class="module-opt-badge badge-required">必填</div>
+          </div>
+          <div class="module-check">✓</div>
+        </div>
+        <div class="module-opt" id="cex-opt" onclick="toggleModule('cex')">
+          <div class="module-opt-icon">🩺</div>
+          <div class="module-opt-info">
+            <div class="module-opt-name">Mini-CEX</div>
+            <div class="module-opt-sub">1–9分 · 7大項</div>
+            <div class="module-opt-badge badge-optional">選配</div>
+          </div>
+          <div class="module-check" id="cex-check"></div>
+        </div>
+        <div class="module-opt" id="cbd-opt" onclick="toggleModule('cbd')">
+          <div class="module-opt-icon">💬</div>
+          <div class="module-opt-info">
+            <div class="module-opt-name">CbD 案例導向討論</div>
+            <div class="module-opt-sub">1–6分 · 7項</div>
+            <div class="module-opt-badge badge-optional">選配</div>
+          </div>
+          <div class="module-check" id="cbd-check"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- META -->
+    <div id="meta" class="card">
+      <div class="card-header">
+        <div class="card-module-stripe stripe-shared"></div>
+        <div class="card-header-info">
+          <div class="card-header-title">基本資料</div>
+          <div class="card-header-sub">填寫一次，自動帶入所有表單</div>
+        </div>
+        <span class="card-module-badge badge-shared">共用</span>
+      </div>
+      <div class="card-body">
+        <div class="meta-grid">
+          <div class="meta-field">
+            <div class="meta-label">學員姓名</div>
+            <input class="meta-input" type="text" placeholder="請輸入姓名">
+          </div>
+          <div class="meta-field">
+            <div class="meta-label">職級</div>
+            <div class="meta-cb-group">
+              <label class="meta-cb"><input type="radio" name="rank" value="ugy"> UGY</label>
+              <label class="meta-cb"><input type="radio" name="rank" value="pgy1"> PGY1</label>
+              <label class="meta-cb"><input type="radio" name="rank" value="pgy2"> PGY2</label>
+            </div>
+          </div>
+          <div class="meta-field">
+            <div class="meta-label">評估時程</div>
+            <div class="meta-cb-group">
+              <label class="meta-cb"><input type="radio" name="period" value="early"> 期初</label>
+              <label class="meta-cb"><input type="radio" name="period" value="mid"> 期中</label>
+              <label class="meta-cb"><input type="radio" name="period" value="late"> 期末</label>
+            </div>
+          </div>
+          <div class="meta-field">
+            <div class="meta-label">教師姓名</div>
+            <input class="meta-input" type="text" placeholder="請輸入姓名">
+          </div>
+          <div class="meta-field">
+            <div class="meta-label">評估日期</div>
+            <input class="meta-input" type="date" id="evalDate">
+          </div>
+          <div class="meta-field">
+            <div class="meta-label">去識別化病歷號</div>
+            <input class="meta-input" type="text" placeholder="後四碼或代號">
+          </div>
+          <div class="meta-field meta-fullrow">
+            <div class="meta-label">病患診斷（可複選）</div>
+            <div class="diag-tags">
+              <span class="diag-tag" onclick="toggleDiag(this)">腦中風（CVA）</span>
+              <span class="diag-tag" onclick="toggleDiag(this)">創傷性腦外傷（TBI）</span>
+              <span class="diag-tag" onclick="toggleDiag(this)">脊髓損傷（SCI）</span>
+              <span class="diag-tag" onclick="toggleDiag(this)">帕金森氏症</span>
+              <span class="diag-tag" onclick="toggleDiag(this)">小腦病灶</span>
+              <span class="diag-tag" onclick="toggleDiag(this)">腦腫瘤</span>
+              <span class="diag-tag" onclick="toggleDiag(this)">癌症腦或脊髓轉移</span>
+              <span class="diag-tag" onclick="toggleDiag(this)" id="diag-other">其他</span>
+            </div>
+            <input class="meta-input hidden" id="diag-other-input" type="text" placeholder="請說明其他診斷" style="margin-top:6px">
+          </div>
+        </div>
+
+        <!-- EPA specific -->
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+          <div class="meta-label" style="margin-bottom:8px">EPA 勾選主題</div>
+          <div class="meta-cb-group">
+            <label class="meta-cb"><input type="checkbox" checked> EPA 1 病史詢問與神經科物理治療檢查</label>
+            <label class="meta-cb"><input type="checkbox" checked> EPA 2 臨床決策與照護計畫</label>
+            <label class="meta-cb"><input type="checkbox" checked> EPA 3 基本功能性活動訓練</label>
+          </div>
+        </div>
+
+        <!-- CbD specific (shows when CbD selected) -->
+        <div id="cbd-meta" class="hidden" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+          <div class="meta-label" style="margin-bottom:8px">CbD 病例資料</div>
+          <div class="meta-grid" style="grid-template-columns:1fr 1fr 1fr">
+            <div class="meta-field">
+              <div class="meta-label">病例分類</div>
+              <div class="meta-cb-group">
+                <label class="meta-cb"><input type="radio" name="case-type" value="phys"> 生理個案</label>
+                <label class="meta-cb"><input type="radio" name="case-type" value="child"> 小兒個案</label>
+                <label class="meta-cb"><input type="radio" name="case-type" value="comm"> 社區復健</label>
+              </div>
+            </div>
+            <div class="meta-field">
+              <div class="meta-label">病例複雜性</div>
+              <div class="meta-cb-group">
+                <label class="meta-cb"><input type="radio" name="complexity" value="low"> 低</label>
+                <label class="meta-cb"><input type="radio" name="complexity" value="mid"> 中</label>
+                <label class="meta-cb"><input type="radio" name="complexity" value="high"> 高</label>
+              </div>
+            </div>
+            <div class="meta-field">
+              <div class="meta-label">臨床討論重點</div>
+              <div class="meta-cb-group">
+                <label class="meta-cb"><input type="checkbox"> 病例記載</label>
+                <label class="meta-cb"><input type="checkbox"> 臨床評估</label>
+                <label class="meta-cb"><input type="checkbox"> 處置</label>
+                <label class="meta-cb"><input type="checkbox"> 專業性討論</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box amber" style="margin-top:14px">
+          📌 評分基準：<strong>UGY 從 Lv2 開始</strong>、<strong>PGY1 從 Lv3 開始</strong>、<strong>PGY2 從 Lv4 開始</strong>給予加減分數
+        </div>
+      </div>
+    </div>
+
+    <!-- EPA TRUST SCALE LEGEND -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-module-stripe stripe-epa"></div>
+        <div class="card-header-info">
+          <div class="card-header-title">信賴等級對照表</div>
+          <div class="card-header-sub">評分時可隨時參考</div>
+        </div>
+        <span class="card-module-badge badge-epa">EPA</span>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:80px">
+            <div style="background:var(--lv1a);color:white;border-radius:6px 6px 0 0;padding:5px 8px;font-size:10px;font-weight:700;text-align:center;">1a 無法參與</div>
+            <div style="background:var(--lv1b);color:white;border-radius:0 0 6px 6px;padding:5px 8px;font-size:10px;font-weight:700;text-align:center;">1b 可參觀</div>
+            <div style="font-size:9px;color:var(--muted);text-align:center;margin-top:2px;">不允許執行</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:80px">
+            <div style="background:var(--lv2a);color:white;border-radius:6px 6px 0 0;padding:5px 8px;font-size:10px;font-weight:700;text-align:center;">2a 全程共同</div>
+            <div style="background:var(--lv2b);color:white;border-radius:0 0 6px 6px;padding:5px 8px;font-size:10px;font-weight:700;text-align:center;">2b 隨時介入</div>
+            <div style="font-size:9px;color:var(--muted);text-align:center;margin-top:2px;">教師全程監督</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:90px">
+            <div style="background:var(--lv3a);color:white;border-radius:6px 6px 0 0;padding:5px 8px;font-size:10px;font-weight:700;text-align:center;">3a 確認全部</div>
+            <div style="background:var(--lv3b);color:white;border-radius:0 0 0 0;padding:5px 8px;font-size:10px;font-weight:700;text-align:center;">3b 確認重要</div>
+            <div style="background:#d4b800;color:white;border-radius:0 0 6px 6px;padding:5px 8px;font-size:10px;font-weight:700;text-align:center;">3c 遠距事後</div>
+            <div style="font-size:9px;color:var(--muted);text-align:center;margin-top:2px;">教師間接監督</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:80px">
+            <div style="background:var(--lv4a);color:white;border-radius:6px 6px 0 0;padding:5px 8px;font-size:10px;font-weight:700;text-align:center;">4a 必要時問</div>
+            <div style="background:var(--lv4b);color:white;border-radius:0 0 6px 6px;padding:5px 8px;font-size:10px;font-weight:700;text-align:center;">4b 完全獨立</div>
+            <div style="font-size:9px;color:var(--muted);text-align:center;margin-top:2px;">可獨立執行</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:60px">
+            <div style="background:var(--lv5);color:white;border-radius:6px;padding:5px 8px;font-size:10px;font-weight:700;text-align:center;flex:1;display:flex;align-items:center;justify-content:center;">5<br>可指導他人</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EPA UNIFIED 1-13 -->
+    <div id="epa1" class="card">
+      <div class="card-header">
+        <div class="card-module-stripe stripe-epa"></div>
+        <div class="card-header-info">
+          <div class="card-header-title">EPA 評估項目（第 1–13 題）</div>
+          <div class="card-header-sub">每題評分一次，系統自動分配至對應 EPA 統計</div>
+        </div>
+        <span class="card-module-badge badge-epa">EPA</span>
+      </div>
+      <div class="card-body">
+        <!-- EPA summary bar -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:120px;background:rgba(14,124,123,0.07);border:1px solid rgba(14,124,123,0.2);border-radius:8px;padding:8px 12px">
+            <div style="font-size:10px;font-weight:700;color:var(--teal-dark);margin-bottom:2px">EPA 1 病史與評估</div>
+            <div style="font-size:12px;color:var(--muted)" id="epa1-count">0 / 5 已評</div>
+          </div>
+          <div style="flex:1;min-width:120px;background:rgba(107,79,160,0.06);border:1px solid rgba(107,79,160,0.2);border-radius:8px;padding:8px 12px">
+            <div style="font-size:10px;font-weight:700;color:var(--purple);margin-bottom:2px">EPA 2 臨床決策</div>
+            <div style="font-size:12px;color:var(--muted)" id="epa2-count">0 / 9 已評</div>
+          </div>
+          <div style="flex:1;min-width:120px;background:rgba(232,160,74,0.08);border:1px solid rgba(232,160,74,0.25);border-radius:8px;padding:8px 12px">
+            <div style="font-size:10px;font-weight:700;color:#8a5a10;margin-bottom:2px">EPA 3 功能訓練</div>
+            <div style="font-size:12px;color:var(--muted)" id="epa3-count">0 / 8 已評</div>
+          </div>
+        </div>
+
+        <div class="info-box teal" style="margin-bottom:14px">💡 跨 EPA 的題目（標有多個標籤）評分一次，系統自動計入所有對應的 EPA 統計</div>
+
+        <!-- All 13 items -->
+        <div id="epa-items-all"></div>
+
+        <!-- 3 overall assessments -->
+        <div style="margin-top:20px;display:flex;flex-direction:column;gap:12px">
+          <div style="padding:14px 16px;background:rgba(14,124,123,0.06);border-radius:10px;border:1.5px solid rgba(14,124,123,0.2)">
+            <div style="font-weight:700;font-size:13px;color:var(--teal-dark);margin-bottom:10px">⑭ 整體任務評估（EPA 1）</div>
+            <div class="trust-scale" id="scale-overall-1"></div>
+          </div>
+          <div style="padding:14px 16px;background:rgba(107,79,160,0.06);border-radius:10px;border:1.5px solid rgba(107,79,160,0.2)">
+            <div style="font-weight:700;font-size:13px;color:var(--purple);margin-bottom:10px">⑮ 整體任務評估（EPA 2）</div>
+            <div class="trust-scale" id="scale-overall-2"></div>
+          </div>
+          <div style="padding:14px 16px;background:rgba(232,160,74,0.08);border-radius:10px;border:1.5px solid rgba(232,160,74,0.3)">
+            <div style="font-weight:700;font-size:13px;color:#8a5a10;margin-bottom:10px">⑯ 整體任務評估（EPA 3）</div>
+            <div class="trust-scale" id="scale-overall-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EPA 2+3 unified continued in same card below -->
+
+    <!-- EPA 2+3 unified continued in same card below -->
+
+    <!-- MINI-CEX -->
+    <div id="cex" class="card hidden" id="cex-card">
+      <div class="card-header">
+        <div class="card-module-stripe stripe-cex"></div>
+        <div class="card-header-info">
+          <div class="card-header-title">Mini-CEX — 迷你臨床演練評估</div>
+          <div class="card-header-sub">填寫後系統自動彙整本次評估項目</div>
+        </div>
+        <span class="card-module-badge badge-cex">選配</span>
+      </div>
+      <div class="card-body">
+        <div class="info-box teal" style="margin-bottom:14px">💡 請直接填寫各項評分，系統將自動記錄本次涵蓋的評估項目，無需事先勾選</div>
+        <div id="cex-items"></div>
+      </div>
+    </div>
+
+    <!-- CbD -->
+    <div id="cbd" class="card hidden">
+      <div class="card-header">
+        <div class="card-module-stripe stripe-cbd"></div>
+        <div class="card-header-info">
+          <div class="card-header-title">CbD — 案例導向討論紀錄</div>
+          <div class="card-header-sub">1–6 分 · U/C = 無法觀察</div>
+        </div>
+        <span class="card-module-badge badge-cbd">選配</span>
+      </div>
+      <div class="card-body">
+        <div class="cbd-score-labels" style="margin-left:34px;margin-bottom:8px;width:auto;display:flex;gap:0">
+          <span style="font-size:9px;color:var(--red);font-weight:600;flex:2;text-align:center">未達預期</span>
+          <span style="font-size:9px;color:var(--accent);font-weight:600;flex:2;text-align:center">接近預期</span>
+          <span style="font-size:9px;color:var(--green);font-weight:600;flex:2;text-align:center">達到/超過</span>
+        </div>
+        <div id="cbd-items"></div>
+      </div>
+    </div>
+
+    <!-- TECH CONTENT (student) -->
+    <div id="tech" class="card">
+      <div class="card-header">
+        <div class="card-module-stripe stripe-cex"></div>
+        <div class="card-header-info">
+          <div class="card-header-title">Mini-CEX 技術內容</div>
+          <div class="card-header-sub">🎓 學員填寫 · 勾選本次實際操作的技術項目，將累積至學習護照</div>
+        </div>
+        <span class="card-module-badge badge-cex">學員</span>
+      </div>
+      <div class="card-body">
+        <div class="tech-grid" id="techGrid"></div>
+      </div>
+    </div>
+
+    <!-- FEEDBACK -->
+    <div id="feedback" class="card">
+      <div class="card-header">
+        <div class="card-module-stripe stripe-shared"></div>
+        <div class="card-header-info">
+          <div class="card-header-title">共用回饋評語</div>
+          <div class="card-header-sub">涵蓋本次所有評核模組，填寫一次即可</div>
+        </div>
+        <span class="card-module-badge badge-shared">共用</span>
+      </div>
+      <div class="card-body">
+        <div class="feedback-grid">
+          <div>
+            <div class="fb-label praise">✦ 值得嘉許</div>
+            <textarea placeholder="記錄表現優異之處…"></textarea>
+          </div>
+          <div>
+            <div class="fb-label improve">▲ 可再精進</div>
+            <textarea placeholder="記錄可改善的項目…"></textarea>
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div class="fb-label action">📋 共識行動（具體改善方針）</div>
+          <textarea placeholder="與學員討論後訂定的具體改善計畫…"></textarea>
+        </div>
+        <div style="background:var(--purple-bg);border-radius:10px;padding:14px 16px;border:1px solid rgba(107,79,160,0.15)">
+          <div class="fb-label student">🎓 學員心得與感受</div>
+          <textarea placeholder="請填寫對本次評核的心得、感受與自我反思…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SATISFACTION -->
+    <div id="sat" class="card">
+      <div class="card-header">
+        <div class="card-module-stripe stripe-shared"></div>
+        <div class="card-header-info">
+          <div class="card-header-title">滿意度與時間紀錄</div>
+        </div>
+        <span class="card-module-badge badge-shared">共用</span>
+      </div>
+      <div class="card-body">
+        <div style="margin-bottom:16px">
+          <div class="sat-row">
+            <span class="sat-label">學員滿意度</span>
+            <div><div class="sat-scale" id="sat-student"></div><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);width:284px;margin-top:2px"><span>低</span><span>高</span></div></div>
+          </div>
+          <div class="sat-row">
+            <span class="sat-label">教師滿意度</span>
+            <div><div class="sat-scale" id="sat-teacher"></div></div>
+          </div>
+        </div>
+        <div class="time-grid">
+          <div class="time-field">
+            <div class="time-label">觀察時間</div>
+            <div class="time-input-row"><input class="time-input" type="number" value="20" min="0"><span class="time-unit">分</span></div>
+          </div>
+          <div class="time-field">
+            <div class="time-label">回饋時間</div>
+            <div class="time-input-row"><input class="time-input" type="number" value="10" min="0"><span class="time-unit">分</span></div>
+          </div>
+          <div class="time-field">
+            <div class="time-label">學員經驗值</div>
+            <div class="exp-row">
+              <button class="exp-btn" onclick="adj('se',-1)">−</button>
+              <span class="exp-num" id="se">1</span>
+              <button class="exp-btn" onclick="adj('se',1)">+</button>
+              <span class="time-unit">次</span>
+            </div>
+          </div>
+          <div class="time-field">
+            <div class="time-label">教師經驗值</div>
+            <div class="exp-row">
+              <button class="exp-btn" onclick="adj('te',-1)">−</button>
+              <span class="exp-num" id="te">1</span>
+              <button class="exp-btn" onclick="adj('te',1)">+</button>
+              <span class="time-unit">次</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIGNATURE -->
+    <div id="sig" class="card">
+      <div class="card-header">
+        <div class="card-module-stripe stripe-shared"></div>
+        <div class="card-header-info"><div class="card-header-title">簽章確認</div><div class="card-header-sub">雙方簽署後完成本次評核</div></div>
+        <span class="card-module-badge badge-shared">共用</span>
+      </div>
+      <div class="card-body">
+        <div class="sig-grid">
+          <div>
+            <div class="sig-label">受訓學員簽章</div>
+            <div class="sig-box" id="sig-s" onclick="sign('s')">點擊簽署確認</div>
+          </div>
+          <div>
+            <div class="sig-label">臨床教師簽章</div>
+            <div class="sig-box" id="sig-t" onclick="sign('t')">點擊簽署確認</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FLOAT SUMMARY -->
+<div class="float-summary">
+  <div class="fs-item"><div class="fs-num" id="fs-epa">0</div><div class="fs-label">EPA已評</div></div>
+  <div class="fs-divider"></div>
+  <div class="fs-item"><div class="fs-num" id="fs-mod">EPA</div><div class="fs-label">啟用模組</div></div>
+  <div class="fs-divider"></div>
+  <div class="fs-item"><div class="fs-num" id="fs-prog">0%</div><div class="fs-label">完成度</div></div>
+  <button class="fs-btn" onclick="submitForm()">送出評核 →</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+const trustLevels = [
+  {code:'1a',desc:'無法參與',cls:'lv1a'},
+  {code:'1b',desc:'可參觀',cls:'lv1b'},
+  {code:'2a',desc:'全程共同',cls:'lv2a'},
+  {code:'2b',desc:'隨時介入',cls:'lv2b'},
+  {code:'3a',desc:'確認全部',cls:'lv3a'},
+  {code:'3b',desc:'確認重要',cls:'lv3b'},
+  {code:'3c',desc:'遠距事後',cls:'lv3c'},
+  {code:'4a',desc:'必要詢問',cls:'lv4a'},
+  {code:'4b',desc:'完全獨立',cls:'lv4b'},
+  {code:'5', desc:'可指導他人',cls:'lv5'},
+];
+
+const epaItems = [
+  {num:1, text:'查閱病歷、影像系統且正確獲取患者相關的重要資訊', epa:[1]},
+  {num:2, text:'病史詢問，有組織性、以個案為中心並考慮背景與相關因，必要時能使用替代資訊來源', epa:[1]},
+  {num:3, text:'安全、正確地執行物理治療評估，尊重個案、重視隱私', epa:[1]},
+  {num:4, text:'正確記錄評估結果', epa:[1]},
+  {num:5, text:'根據評估整理成具邏輯性的問題清單或功能性診斷，並提出合理的假說', epa:[2]},
+  {num:6, text:'能辨識非物理治療相關的系統性問題與 red flag，並能適時轉介或聯繫相關臨床人員', epa:[2,3]},
+  {num:7, text:'考慮個案需求、生活環境等，設立合理且可達成的短、長期目標', epa:[2]},
+  {num:8, text:'掌握主要及次要問題', epa:[2,3]},
+  {num:9, text:'擬定合宜的物理治療計畫，包括依據實證、訓練介入策略、活動順序及合宜的 FITT', epa:[2]},
+  {num:10,text:'在治療執行過程中能掌握患者能力與進度，適當使用輔具與環境設置，並隨時監測與處理可能的安全問題，包含正確應用身體力學與保護策略', epa:[3]},
+  {num:11,text:'即時判斷介入的反應或成效，視需要調整介入內容', epa:[2,3]},
+  {num:12,text:'擬定及提供合宜的居家運動計畫', epa:[2,3]},
+  {num:13,text:'提供個案及照顧者相關說明、衛教與指導，採用適合溝通技巧', epa:[1,3]},
+];
+
+const epaGroups = {
+  1: epaItems.filter(i=>i.epa.includes(1)),
+  2: epaItems.filter(i=>i.epa.includes(2)),
+  3: epaItems.filter(i=>i.epa.includes(3)),
+};
+
+const cexItems = [
+  {num:1, title:'醫療面談', subs:['是否確認並適當稱呼病患','自我介紹是否得宜','能鼓勵病患說病史','適切發問及引導以獲得正確且足夠的訊息','對病患情緒及肢體語言有適當的回應']},
+  {num:2, title:'身體檢查評估', subs:['告知病患評估的目的','選擇評估工具的適切性','正確的評估技巧','評估過程是否對病患情緒及肢體語言有適當的回應','評估環境的選擇是否恰當']},
+  {num:3, title:'臨床操作技能及治療', subs:['治療師給予病人之治療與處置是否正確','治療技巧是否熟練','治療師的相對位置與手法正確與否','治療師給予病人的口令與語氣正確與否','治療師給予治療期間之協助正確與否','治療師給予治療動作之指導正確與否','有無注意到病人之安全']},
+  {num:4, title:'諮商衛教', subs:['是否解釋評估結果','是否解釋治療活動安排的目的','是否給予病患或家屬適當的衛教（含輔具衛教）','是否給予病患或家屬適當的 Home Program']},
+  {num:5, title:'臨床判斷', subs:['是否能夠針對病人了解主要問題及目標設立','是否能夠達到病人治療處置安排之合理性與邏輯性','治療過程是否注意病患有不舒適感並針對此做出適當的處置','治療過程與結束是否重視病患反應']},
+  {num:6, title:'組織效能', subs:['是否能綜合面談與評估資料','是否按優先順序來處置','是否按照輕重緩急且適時來處置','是否歷練而簡潔']},
+  {num:7, title:'人道專業', subs:['整體過程是否表現尊重態度','整體過程是否表現同理心（感同身受）','是否與病患建立良好關係與信任感','是否注重隱私','對病患尋求相關訊息的需求能適當滿足']},
+];
+
+const cbdItems = [
+  '病例記載（medical record keeping）',
+  '臨床評估（clinical assessment）',
+  '檢查與關連（investigation & referrals）',
+  '治療（treatment）',
+  '追蹤與計畫（follow-up and future planning）',
+  '專業（professionalism）',
+  '整體臨床判斷（overall clinical judgement）',
+];
+
+const techItems = [
+  '評估','正確擺位/被動關節運動/拉筋','神經誘發技巧/誘發動作訓練','抑制張力手法',
+  '墊上活動','轉位訓練/移位訓練','坐姿/站姿平衡訓練','坐到站訓練',
+  '肌力/肌耐力訓練','承重與重心轉移訓練','步態訓練/行走訓練','輪椅操作訓練',
+  '心肺耐力訓練','日常生活訓練','輔具建議','一般/深層按摩手法',
+  '關節鬆動術/MWM','AROM/AAROM exercise','核心運動','平衡反應訓練',
+  '姿勢矯正訓練/衛教','腹式呼吸','頭部控制訓練','軀幹控制訓練',
+  '物品操作訓練','協調訓練','居家運動衛教',
+];
+
+// STATE
+const epaScores = {};
+const cexScores = {};
+const cbdScores = {};
+const modules = {cex:false, cbd:false};
+const expState = {se:1, te:1};
+
+// ── RENDER ──
+function makeTrustScale(id) {
+  return trustLevels.map((lv,i) =>
+    `<button class="trust-btn ${lv.cls}" onclick="setEPA('${id}','${lv.code}',this)">
+      <span class="lv-code">${lv.code}</span>
+      <span class="lv-desc">${lv.desc}</span>
+    </button>`
+  ).join('') + `<button class="trust-na" onclick="setEPAna('${id}',this)">X 不適用</button>`;
+}
+
+function renderEPAAll() {
+  const container = document.getElementById('epa-items-all');
+  if(!container) return;
+  container.innerHTML = epaItems.map(item => `
+    <div class="epa-item" id="epa-item-${item.num}">
+      <div class="epa-item-header">
+        <div class="epa-num">${item.num}</div>
+        <div style="flex:1">
+          <div class="epa-item-text">${item.text}</div>
+          <div class="epa-item-tags">
+            ${item.epa.map(e=>{
+              const colors={1:'epa-tag-1',2:'epa-tag-2',3:'epa-tag-3'};
+              return `<span class="epa-tag ${colors[e]}">EPA ${e}</span>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <div class="trust-scale" id="scale-${item.num}">${makeTrustScale(item.num)}</div>
+      </div>
+    </div>
+  `).join('');
+
+  const o1 = document.getElementById('scale-overall-1');
+  const o2 = document.getElementById('scale-overall-2');
+  const o3 = document.getElementById('scale-overall-3');
+  if(o1) o1.innerHTML = makeTrustScale('o1');
+  if(o2) o2.innerHTML = makeTrustScale('o2');
+  if(o3) o3.innerHTML = makeTrustScale('o3');
+}
+
+function renderCEX() {
+  const c = document.getElementById('cex-items');
+  if(!c) return;
+  c.innerHTML = cexItems.map(item => `
+    <div class="cex-item">
+      <div class="cex-item-header">
+        <div class="cex-num">${item.num}</div>
+        <div class="cex-title">${item.title}</div>
+        <div class="cex-score-preview" id="cex-prev-${item.num}">—</div>
+      </div>
+      <div class="sub-items-cex">
+        ${item.subs.map((s,i)=>`<div class="sub-item"><span class="sub-n">${i+1}.</span><span class="sub-t">${s}</span></div>`).join('')}
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <div class="score-scale">
+          ${[1,2,3].map(n=>`<button class="score-btn s${n}" onclick="setCEX(${item.num},${n},this)">${n}</button>`).join('')}
+          <div class="score-divider"></div>
+          ${[4,5,6].map(n=>`<button class="score-btn s${n}" onclick="setCEX(${item.num},${n},this)">${n}</button>`).join('')}
+          <div class="score-divider"></div>
+          ${[7,8,9].map(n=>`<button class="score-btn s${n}" onclick="setCEX(${item.num},${n},this)">${n}</button>`).join('')}
+        </div>
+        <button class="cex-na" onclick="setCEXna(${item.num},this)">未觀察</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderCBD() {
+  const c = document.getElementById('cbd-items');
+  if(!c) return;
+  c.innerHTML = cbdItems.map((title,i) => `
+    <div class="cbd-item">
+      <div class="cbd-num">${i+1}</div>
+      <div class="cbd-title">${title}</div>
+      <div class="cbd-scale">
+        ${[1,2,3,4,5,6].map(n=>`<button class="cbd-btn b${n}" onclick="setCBD(${i},${n},this)">${n}</button>`).join('')}
+      </div>
+      <button class="cbd-uc" onclick="setCBDuc(${i},this)">U/C</button>
+    </div>
+  `).join('');
+}
+
+function renderTech() {
+  const g = document.getElementById('techGrid');
+  if(!g) return;
+  g.innerHTML = techItems.map((t,i) => `
+    <label class="tech-tag" id="tech-${i}">
+      <input type="checkbox" onchange="toggleTech(${i},this)" style="display:none">
+      ${t}
+    </label>
+  `).join('');
+}
+
+function renderSat() {
+  ['sat-student','sat-teacher'].forEach(id => {
+    const c = document.getElementById(id);
+    if(c) c.innerHTML = Array.from({length:10},(_,i)=>
+      `<button class="sat-btn" onclick="setSat('${id}',${i+1},this)">${i+1}</button>`
+    ).join('');
+  });
+}
+
+// ── INTERACTIONS ──
+function setEPA(id, code, btn) {
+  const scale = btn.closest('.trust-scale');
+  scale.querySelectorAll('.trust-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  epaScores[id] = code;
+  updateEPACounts();
+  updateProgress();
+}
+function setEPAna(id, btn) {
+  const scale = btn.closest('.trust-scale');
+  scale.querySelectorAll('.trust-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.toggle('active');
+  if(btn.classList.contains('active')) {
+    epaScores[id] = 'X';
+    const item = document.getElementById(`epa-item-${id}`);
+    if(item) item.style.opacity = '0.5';
+  } else {
+    delete epaScores[id];
+    const item = document.getElementById(`epa-item-${id}`);
+    if(item) item.style.opacity = '';
+  }
+  updateEPACounts();
+  updateProgress();
+}
+
+function setCEX(num, val, btn) {
+  const scale = btn.closest('.score-scale');
+  scale.querySelectorAll('.score-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  cexScores[num] = val;
+  const prev = document.getElementById(`cex-prev-${num}`);
+  if(prev){ prev.textContent = val; prev.classList.add('scored'); }
+  updateProgress();
+}
+function setCEXna(num, btn) {
+  const item = btn.closest('.cex-item');
+  item.querySelectorAll('.score-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.toggle('active');
+  if(btn.classList.contains('active')) { cexScores[num]='na'; }
+  else { delete cexScores[num]; }
+  updateProgress();
+}
+function setCBD(idx, val, btn) {
+  const row = btn.closest('.cbd-item');
+  row.querySelectorAll('.cbd-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  cbdScores[idx] = val;
+  updateProgress();
+}
+function setCBDuc(idx, btn) {
+  const row = btn.closest('.cbd-item');
+  row.querySelectorAll('.cbd-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.toggle('active');
+  cbdScores[idx] = btn.classList.contains('active') ? 'uc' : undefined;
+  updateProgress();
+}
+function toggleTech(i, cb) {
+  document.getElementById(`tech-${i}`).classList.toggle('selected', cb.checked);
+}
+function setSat(id, val, btn) {
+  document.querySelectorAll(`#${id} .sat-btn`).forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function toggleModule(mod) {
+  modules[mod] = !modules[mod];
+  const opt = document.getElementById(`${mod}-opt`);
+  const check = document.getElementById(`${mod}-check`);
+  const card = document.getElementById(mod);
+  opt.classList.toggle('selected', modules[mod]);
+  check.textContent = modules[mod] ? '✓' : '';
+  if(card) card.classList.toggle('hidden', !modules[mod]);
+  if(mod==='cbd') {
+    const cbdMeta = document.getElementById('cbd-meta');
+    if(cbdMeta) cbdMeta.classList.toggle('hidden', !modules[mod]);
+  }
+  updateFloatMod();
+  updateProgress();
+}
+
+function updateEPACounts() {
+  // Count scored items per EPA group (shared items count for all their EPAs)
+  const counts = {1:0, 2:0, 3:0};
+  Object.keys(epaScores).forEach(k => {
+    const num = parseInt(k);
+    if(isNaN(num)) return;
+    const item = epaItems.find(i=>i.num===num);
+    if(item) item.epa.forEach(e => counts[e]++);
+  });
+  // Totals: unique items per EPA
+  const totals = {
+    1: epaItems.filter(i=>i.epa.includes(1)).length,
+    2: epaItems.filter(i=>i.epa.includes(2)).length,
+    3: epaItems.filter(i=>i.epa.includes(3)).length,
+  };
+  [1,2,3].forEach(g => {
+    const el = document.getElementById(`epa${g}-count`);
+    if(el) el.textContent = `${counts[g]} / ${totals[g]} 已評`;
+  });
+  // Float summary: unique items scored (not counting shared items twice)
+  const uniqueScored = Object.keys(epaScores).filter(k=>!isNaN(parseInt(k))).length;
+  document.getElementById('fs-epa').textContent = uniqueScored + '/13';
+}
+
+function updateFloatMod() {
+  const mods = ['EPA'];
+  if(modules.cex) mods.push('CEX');
+  if(modules.cbd) mods.push('CbD');
+  document.getElementById('fs-mod').textContent = mods.join('+');
+}
+
+function updateProgress() {
+  const epaTotal = 13 + 3; // 13 items + 3 overall
+  const epaDone = Object.keys(epaScores).length;
+  let total = epaTotal, done = epaDone;
+  if(modules.cex){ total+=7; done+=Object.keys(cexScores).length; }
+  if(modules.cbd){ total+=7; done+=Object.keys(cbdScores).filter(k=>cbdScores[k]!==undefined).length; }
+  const pct = Math.round(done/total*100);
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progPct').textContent = pct+'%';
+  document.getElementById('fs-prog').textContent = pct+'%';
+}
+
+function toggleDiag(el) {
+  el.classList.toggle('selected');
+  if(el.id==='diag-other') {
+    document.getElementById('diag-other-input').classList.toggle('hidden', !el.classList.contains('selected'));
+  }
+}
+
+function setMode(mode, btn) {
+  document.querySelectorAll('.mode-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  showToast(mode==='supervisor' ? '👩‍⚕️ 督導填寫模式' : '🎓 學員填寫模式');
+}
+
+function adj(id, d) {
+  expState[id] = Math.max(1, expState[id]+d);
+  document.getElementById(id).textContent = expState[id];
+}
+
+function sign(who) {
+  const box = document.getElementById(`sig-${who}`);
+  box.classList.add('signed');
+  const now = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  box.innerHTML = `<span class="sig-signed-text">✓ ${who==='s'?'學員':'教師'}已簽署 · ${now}</span>`;
+  showToast('✅ 簽署完成');
+}
+
+function saveDraft() { showToast('💾 草稿已儲存'); }
+
+function submitForm() {
+  const epaDone = Object.keys(epaScores).length;
+  if(epaDone < 5) { showToast('⚠️ EPA 尚有項目未填寫'); return; }
+  showToast('✅ 評核已送出！資料將同步至 E-portfolio');
+}
+
+function scrollTo(id) {
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// ── INIT ──
+document.getElementById('evalDate').value = new Date().toISOString().split('T')[0];
+renderEPAAll();
+renderCEX();
+renderCBD();
+renderTech();
+renderSat();
+updateFloatMod();
+</script>
+</body>
+</html>

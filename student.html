@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>學員儀表板 — PT實習通</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#0E7C7B;--teal-light:#1AA0A0;--teal-dark:#075E5E;
+  --cream:#F7F4EF;--warm:#FDFCFA;--charcoal:#1C2B2B;
+  --slate:#3D5555;--muted:#7A9090;
+  --accent:#E8A04A;--accent-bg:#FDF0DC;
+  --red:#D0575A;--red-bg:#FCE8E8;
+  --green:#2E9E6B;--green-bg:#E3F5ED;
+  --purple:#6B4FA0;--purple-bg:#F0EBF8;
+  --border:rgba(14,124,123,0.13);
+  --sidebar-w:240px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--cream);color:var(--charcoal);display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--charcoal);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-logo{padding:18px 16px 14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.sb-logo-icon{width:32px;height:32px;background:var(--purple);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:13px;font-family:'DM Serif Display',serif;}
+.sb-logo-text{color:white;font-family:'Noto Serif TC',serif;font-weight:900;font-size:15px;letter-spacing:2px;}
+.sb-user{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px;}
+.sb-avatar{width:36px;height:36px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;flex-shrink:0;}
+.sb-user-name{color:white;font-size:13px;font-weight:700;}
+.sb-user-role{color:rgba(255,255,255,0.4);font-size:11px;margin-top:2px;}
+.sb-nav{padding:12px 10px;flex:1;}
+.sb-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);padding:0 6px;margin:10px 0 4px;}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;transition:all .15s;margin-bottom:2px;text-decoration:none;}
+.sb-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85);}
+.sb-item.active{background:rgba(107,79,160,0.35);color:white;}
+.sb-icon{font-size:15px;width:20px;text-align:center;}
+.sb-badge{margin-left:auto;background:var(--red);color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:100px;}
+.sb-bottom{padding:14px 16px;border-top:1px solid rgba(255,255,255,0.08);}
+.sb-logout{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.35);font-size:12px;cursor:pointer;transition:color .15s;text-decoration:none;}
+.sb-logout:hover{color:rgba(255,255,255,0.7);}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:white;border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-title{font-family:'Noto Serif TC',serif;font-weight:900;font-size:17px;}
+.topbar-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.btn{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:none;transition:all .18s;display:inline-flex;align-items:center;gap:5px;}
+.btn-purple{background:var(--purple);color:white;}
+.btn-purple:hover{background:#5a3d8b;}
+.btn-ghost{background:transparent;color:var(--slate);border:1.5px solid var(--border);}
+.btn-ghost:hover{border-color:var(--purple);color:var(--purple);}
+
+.content{flex:1;overflow-y:auto;padding:24px 28px;}
+
+/* WELCOME BANNER */
+.welcome-banner{background:linear-gradient(135deg,var(--purple) 0%,#8B6FBF 100%);border-radius:16px;padding:24px 28px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;}
+.welcome-banner::after{content:'🎓';position:absolute;right:24px;bottom:-10px;font-size:80px;opacity:.15;}
+.welcome-text{}
+.welcome-greeting{color:rgba(255,255,255,0.75);font-size:13px;margin-bottom:4px;}
+.welcome-name{color:white;font-family:'Noto Serif TC',serif;font-weight:900;font-size:22px;}
+.welcome-detail{color:rgba(255,255,255,0.65);font-size:12px;margin-top:6px;}
+.welcome-stats{display:flex;gap:20px;position:relative;z-index:1;}
+.welcome-stat{text-align:center;}
+.welcome-stat-num{font-family:'DM Serif Display',serif;font-size:28px;color:white;line-height:1;}
+.welcome-stat-label{font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px;}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.stat-card{background:white;border-radius:14px;border:1px solid var(--border);padding:16px 18px;position:relative;overflow:hidden;}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
+.stat-card.purple::after{background:var(--purple);}
+.stat-card.teal::after{background:var(--teal);}
+.stat-card.amber::after{background:var(--accent);}
+.stat-card.green::after{background:var(--green);}
+.stat-icon{font-size:20px;margin-bottom:8px;}
+.stat-num{font-family:'DM Serif Display',serif;font-size:28px;line-height:1;color:var(--charcoal);}
+.stat-label{font-size:11px;color:var(--muted);margin-top:4px;}
+.stat-sub{font-size:11px;font-weight:600;margin-top:6px;}
+
+/* MAIN GRID */
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+
+/* CARD */
+.card{background:white;border-radius:14px;border:1px solid var(--border);overflow:hidden;}
+.card-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-weight:700;font-size:13px;color:var(--charcoal);display:flex;align-items:center;gap:7px;}
+.card-action{font-size:11px;color:var(--purple);font-weight:600;cursor:pointer;}
+.card-body{padding:16px 18px;}
+
+/* TODO LIST */
+.todo-list{display:flex;flex-direction:column;gap:8px;}
+.todo-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--cream);border-radius:10px;border-left:3px solid transparent;cursor:pointer;transition:all .18s;}
+.todo-item:hover{background:rgba(107,79,160,0.05);border-left-color:var(--purple);}
+.todo-item.urgent{border-left-color:var(--red);}
+.todo-item.pending{border-left-color:var(--accent);}
+.todo-icon{font-size:18px;flex-shrink:0;}
+.todo-info{flex:1;}
+.todo-name{font-size:12px;font-weight:700;color:var(--charcoal);}
+.todo-detail{font-size:11px;color:var(--muted);margin-top:2px;}
+.todo-due{font-size:10px;margin-top:3px;}
+.due-urgent{color:var(--red);font-weight:600;}
+.due-normal{color:var(--muted);}
+.todo-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;}
+.tag-heart{background:rgba(107,79,160,0.1);color:var(--purple);}
+.tag-tech{background:rgba(14,124,123,0.1);color:var(--teal-dark);}
+.tag-record{background:var(--accent-bg);color:#8a5a10;}
+.tag-feedback{background:var(--green-bg);color:#1a6b40;}
+
+/* FEEDBACK LIST */
+.feedback-list{display:flex;flex-direction:column;gap:8px;}
+.feedback-item{padding:12px 14px;background:var(--cream);border-radius:10px;border-left:3px solid var(--teal);}
+.feedback-item.new{border-left-color:var(--purple);}
+.feedback-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.feedback-from{font-size:12px;font-weight:700;color:var(--charcoal);}
+.feedback-date{font-size:10px;color:var(--muted);}
+.feedback-type{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;margin-bottom:6px;display:inline-block;}
+.type-epa{background:rgba(14,124,123,0.1);color:var(--teal-dark);}
+.type-cex{background:var(--purple-bg);color:var(--purple);}
+.type-cbd{background:var(--accent-bg);color:#8a5a10;}
+.feedback-praise{font-size:12px;color:var(--green);margin-bottom:4px;}
+.feedback-improve{font-size:12px;color:var(--accent);}
+.feedback-new-badge{font-size:9px;font-weight:700;background:var(--purple);color:white;padding:2px 6px;border-radius:100px;margin-left:6px;}
+
+/* PORTFOLIO */
+.portfolio-list{display:flex;flex-direction:column;gap:8px;}
+.portfolio-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--cream);border-radius:10px;}
+.portfolio-icon{font-size:16px;flex-shrink:0;}
+.portfolio-info{flex:1;}
+.portfolio-name{font-size:12px;font-weight:700;color:var(--charcoal);}
+.portfolio-count{font-size:11px;color:var(--muted);margin-top:2px;}
+.portfolio-bar{width:80px;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.portfolio-fill{height:100%;border-radius:3px;}
+
+/* ATTEND CARD */
+.attend-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.attend-item{background:var(--cream);border-radius:10px;padding:12px;text-align:center;}
+.attend-num{font-family:'DM Serif Display',serif;font-size:24px;color:var(--charcoal);}
+.attend-label{font-size:10px;color:var(--muted);margin-top:3px;}
+.attend-item.warn .attend-num{color:var(--red);}
+
+.attend-list{display:flex;flex-direction:column;gap:6px;}
+.attend-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--cream);border-radius:8px;font-size:12px;}
+.attend-date{color:var(--muted);width:80px;flex-shrink:0;}
+.attend-status{flex:1;font-weight:600;}
+.status-present{color:var(--green);}
+.status-late{color:var(--accent);}
+.status-absent{color:var(--red);}
+.attend-time{font-size:11px;color:var(--muted);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--charcoal);color:white;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,0.2);}
+.toast.show{opacity:1;transform:none;}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .main-grid{grid-template-columns:1fr;}
+  .welcome-stats{display:none;}
+  .content{padding:16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">PT</div>
+    <span class="sb-logo-text">實習通</span>
+  </div>
+  <div class="sb-user">
+    <div class="sb-avatar" id="sbAvatar">學</div>
+    <div>
+      <div class="sb-user-name" id="sbName">實習學員</div>
+      <div class="sb-user-role">🎓 實習學員 · 神經站</div>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-label">主選單</div>
+    <a class="sb-item active" href="student.html"><span class="sb-icon">🏠</span> 我的儀表板</a>
+    <a class="sb-item" href="#"><span class="sb-icon">📖</span> 學習護照</a>
+    <a class="sb-item" href="#"><span class="sb-icon">💬</span> 老師回饋 <span class="sb-badge">2</span></a>
+    <a class="sb-item" href="#"><span class="sb-icon">📝</span> 學習紀錄單</a>
+    <div class="sb-label">待完成</div>
+    <a class="sb-item" href="#"><span class="sb-icon">✍️</span> 填寫心得 <span class="sb-badge">3</span></a>
+    <a class="sb-item" href="#"><span class="sb-icon">✅</span> 技術內容勾選</a>
+    <div class="sb-label">出勤</div>
+    <a class="sb-item" href="#"><span class="sb-icon">📍</span> 今日打卡</a>
+    <a class="sb-item" href="#"><span class="sb-icon">📅</span> 出勤紀錄</a>
+    <a class="sb-item" href="#"><span class="sb-icon">🏖️</span> 請假申請</a>
+  </div>
+  <div class="sb-bottom">
+    <a class="sb-logout" href="index.html"><span>🚪</span> 登出</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">我的學習儀表板</div>
+      <div class="topbar-sub" id="todayDate"></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="showToast('📍 打卡成功！08:12 簽到')">📍 立即打卡</button>
+      <button class="btn btn-purple" onclick="showToast('🏖️ 請假申請已送出，等待老師審核')">🏖️ 申請請假</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- WELCOME BANNER -->
+    <div class="welcome-banner">
+      <div class="welcome-text">
+        <div class="welcome-greeting">早安，歡迎回來 👋</div>
+        <div class="welcome-name" id="welcomeName">實習學員</div>
+        <div class="welcome-detail">神經站 · 第3週 · 2026年4月16日</div>
+      </div>
+      <div class="welcome-stats">
+        <div class="welcome-stat">
+          <div class="welcome-stat-num">12</div>
+          <div class="welcome-stat-label">已完成評核</div>
+        </div>
+        <div class="welcome-stat">
+          <div class="welcome-stat-num">3</div>
+          <div class="welcome-stat-label">待填心得</div>
+        </div>
+        <div class="welcome-stat">
+          <div class="welcome-stat-num">98%</div>
+          <div class="welcome-stat-label">出勤率</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stat-grid">
+      <div class="stat-card purple">
+        <div class="stat-icon">📋</div>
+        <div class="stat-num">3</div>
+        <div class="stat-label">待填寫心得</div>
+        <div class="stat-sub" style="color:var(--red)">⚠ 1份明天截止</div>
+      </div>
+      <div class="stat-card teal">
+        <div class="stat-icon">💬</div>
+        <div class="stat-num">2</div>
+        <div class="stat-label">新的老師回饋</div>
+        <div class="stat-sub" style="color:var(--teal)">→ 點擊查看</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-icon">✅</div>
+        <div class="stat-num">18</div>
+        <div class="stat-label">技術項目已記錄</div>
+        <div class="stat-sub" style="color:var(--muted)">共 27 項可勾選</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">📍</div>
+        <div class="stat-num">98%</div>
+        <div class="stat-label">本月出勤率</div>
+        <div class="stat-sub" style="color:var(--green)">↑ 表現優良</div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+
+      <!-- TODO -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">✍️ 待完成事項</div>
+          <span class="card-action">查看全部</span>
+        </div>
+        <div class="card-body">
+          <div class="todo-list">
+            <div class="todo-item urgent">
+              <div class="todo-icon">💬</div>
+              <div class="todo-info">
+                <div class="todo-name">EPA 期中評核 — 學員心得</div>
+                <div class="todo-detail">老師已完成評核，請填寫您的心得與感受</div>
+                <div class="todo-due due-urgent">⚠ 截止：明天</div>
+              </div>
+              <span class="todo-tag tag-heart">心得</span>
+            </div>
+            <div class="todo-item pending">
+              <div class="todo-icon">✅</div>
+              <div class="todo-info">
+                <div class="todo-name">Mini-CEX 技術內容勾選</div>
+                <div class="todo-detail">4/15 評核 — 請勾選本次操作技術項目</div>
+                <div class="todo-due due-normal">截止：本週五</div>
+              </div>
+              <span class="todo-tag tag-tech">技術</span>
+            </div>
+            <div class="todo-item pending">
+              <div class="todo-icon">📝</div>
+              <div class="todo-info">
+                <div class="todo-name">CbD 案例討論 — 學員心得</div>
+                <div class="todo-detail">4/12 案例討論 — 填寫學習反思</div>
+                <div class="todo-due due-normal">截止：下週一</div>
+              </div>
+              <span class="todo-tag tag-heart">心得</span>
+            </div>
+            <div class="todo-item pending">
+              <div class="todo-icon">📖</div>
+              <div class="todo-info">
+                <div class="todo-name">學習紀錄單 — Book Reading</div>
+                <div class="todo-detail">本週閱讀報告學習紀錄</div>
+                <div class="todo-due due-normal">截止：下週三</div>
+              </div>
+              <span class="todo-tag tag-record">紀錄</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEEDBACK -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">💬 老師回饋</div>
+          <span class="card-action">查看全部</span>
+        </div>
+        <div class="card-body">
+          <div class="feedback-list">
+            <div class="feedback-item new">
+              <div class="feedback-header">
+                <span class="feedback-from">陳指導老師 <span class="feedback-new-badge">新</span></span>
+                <span class="feedback-date">2026/04/15</span>
+              </div>
+              <div class="feedback-type type-epa">EPA 期中評核</div>
+              <div class="feedback-praise">✦ 病史詢問有組織性，與病患溝通表現良好</div>
+              <div class="feedback-improve">▲ 臨床判斷部分需加強，建議多練習問題清單整理</div>
+            </div>
+            <div class="feedback-item new">
+              <div class="feedback-header">
+                <span class="feedback-from">陳指導老師 <span class="feedback-new-badge">新</span></span>
+                <span class="feedback-date">2026/04/12</span>
+              </div>
+              <div class="feedback-type type-cex">Mini-CEX</div>
+              <div class="feedback-praise">✦ 操作技巧熟練，病患安全意識佳</div>
+              <div class="feedback-improve">▲ 衛教說明可以更簡潔清楚</div>
+            </div>
+            <div class="feedback-item">
+              <div class="feedback-header">
+                <span class="feedback-from">陳指導老師</span>
+                <span class="feedback-date">2026/04/05</span>
+              </div>
+              <div class="feedback-type type-cbd">CbD</div>
+              <div class="feedback-praise">✦ 案例分析邏輯清晰，問題清單完整</div>
+              <div class="feedback-improve">▲ 居家運動計畫設計可更個別化</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PORTFOLIO -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📖 學習護照進度</div>
+          <span class="card-action">查看完整護照</span>
+        </div>
+        <div class="card-body">
+          <div class="portfolio-list">
+            <div class="portfolio-item">
+              <div class="portfolio-icon">🧠</div>
+              <div class="portfolio-info">
+                <div class="portfolio-name">神經物理治療評估與技術操作</div>
+                <div class="portfolio-count">12 筆紀錄</div>
+              </div>
+              <div class="portfolio-bar"><div class="portfolio-fill" style="width:80%;background:var(--teal)"></div></div>
+            </div>
+            <div class="portfolio-item">
+              <div class="portfolio-icon">📋</div>
+              <div class="portfolio-info">
+                <div class="portfolio-name">治療紀錄之擬定</div>
+                <div class="portfolio-count">8 筆紀錄</div>
+              </div>
+              <div class="portfolio-bar"><div class="portfolio-fill" style="width:60%;background:var(--purple)"></div></div>
+            </div>
+            <div class="portfolio-item">
+              <div class="portfolio-icon">🗣️</div>
+              <div class="portfolio-info">
+                <div class="portfolio-name">醫病關係與人際溝通技巧</div>
+                <div class="portfolio-count">6 筆紀錄</div>
+              </div>
+              <div class="portfolio-bar"><div class="portfolio-fill" style="width:50%;background:var(--accent)"></div></div>
+            </div>
+            <div class="portfolio-item">
+              <div class="portfolio-icon">📚</div>
+              <div class="portfolio-info">
+                <div class="portfolio-name">參與學術活動</div>
+                <div class="portfolio-count">3 筆紀錄</div>
+              </div>
+              <div class="portfolio-bar"><div class="portfolio-fill" style="width:30%;background:var(--green)"></div></div>
+            </div>
+            <div class="portfolio-item">
+              <div class="portfolio-icon">🔬</div>
+              <div class="portfolio-info">
+                <div class="portfolio-name">了解實驗室檢查與影像判讀</div>
+                <div class="portfolio-count">2 筆紀錄</div>
+              </div>
+              <div class="portfolio-bar"><div class="portfolio-fill" style="width:20%;background:var(--red)"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATTENDANCE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📍 本週出勤紀錄</div>
+          <span class="card-action">查看全部</span>
+        </div>
+        <div class="card-body">
+          <div class="attend-summary">
+            <div class="attend-item">
+              <div class="attend-num">18</div>
+              <div class="attend-label">出勤天數</div>
+            </div>
+            <div class="attend-item">
+              <div class="attend-num">0</div>
+              <div class="attend-label">缺勤天數</div>
+            </div>
+            <div class="attend-item warn">
+              <div class="attend-num">1</div>
+              <div class="attend-label">請假天數</div>
+            </div>
+          </div>
+          <div class="attend-list">
+            <div class="attend-row">
+              <span class="attend-date">4/16（三）</span>
+              <span class="attend-status status-present">✓ 出勤</span>
+              <span class="attend-time">08:12 簽到</span>
+            </div>
+            <div class="attend-row">
+              <span class="attend-date">4/15（二）</span>
+              <span class="attend-status status-present">✓ 出勤</span>
+              <span class="attend-time">08:05 簽到</span>
+            </div>
+            <div class="attend-row">
+              <span class="attend-date">4/14（一）</span>
+              <span class="attend-status status-late">⚠ 遲到</span>
+              <span class="attend-time">08:35 簽到</span>
+            </div>
+            <div class="attend-row">
+              <span class="attend-date">4/11（五）</span>
+              <span class="attend-status status-present">✓ 出勤</span>
+              <span class="attend-time">08:08 簽到</span>
+            </div>
+            <div class="attend-row">
+              <span class="attend-date">4/10（四）</span>
+              <span class="attend-status status-absent">✗ 病假</span>
+              <span class="attend-time">已核准</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Check login
+const role = sessionStorage.getItem('pt-role');
+const id = sessionStorage.getItem('pt-id');
+if(!role || role !== 'student') {
+  window.location.href = 'index.html';
+}
+
+// Set user info
+if(id) {
+  document.getElementById('sbName').textContent = id;
+  document.getElementById('sbAvatar').textContent = '學';
+  document.getElementById('welcomeName').textContent = id + ' 同學';
+}
+
+// Date
+const now = new Date();
+document.getElementById('todayDate').textContent =
+  now.toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
