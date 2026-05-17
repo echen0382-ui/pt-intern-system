@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PT實習通 — 醫院復健科</title>
+<title>PT實習通 — 豐原醫院復健科</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -151,35 +151,35 @@ footer{position:relative;z-index:1;padding:20px 48px;border-top:1px solid var(--
     <div class="id-section">
       <div class="id-title">🔑 請輸入您的編號</div>
       <div class="id-input-wrap">
-        <input class="id-input" type="text" id="idInput" placeholder="學號或員工編號" maxlength="20">
+        <input class="id-input" type="email" id="idInput" placeholder="您的 Gmail（例：name@gmail.com）">
         <button class="id-btn" onclick="login()">進入系統</button>
       </div>
-      <div class="error-msg" id="errorMsg">⚠ 找不到此編號，請確認後重新輸入</div>
+      <div class="error-msg" id="errorMsg">⚠ 找不到此 Gmail，請確認後重新輸入</div>
       <div class="id-hint">
-        · 學員請輸入學號（例：PT11201）<br>
-        · 指導老師請輸入員工編號（例：T001）<br>
-        · 如有問題請聯繫實習負責人
+        · 請輸入您登記的 Gmail<br>
+        · 尚未登記請聯繫實習負責人<br>
+        · 登入後資料自動同步至系統
       </div>
     </div>
 
-    <div class="demo-notice">
-      <strong>📌 目前為示範版本</strong><br>
-      輸入任意學號（以 PT 開頭）進入學員介面，輸入任意教師編號（以 T 開頭）進入督導介面。正式上線後將串接實際名單。
-    </div>
   </div>
 </main>
 
 <footer>
   <span class="footer-copy">© 2026 PT實習通</span>
-  <span class="footer-version">Demo v1.0</span>
+  <span class="footer-version">v1.0</span>
 </footer>
 
 <script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbzNfhZKb3aPIanHTyBKMRzQ9t1U2g7tRysm3o8HACHzTkAGfB64kCXfp-K854YfG9ew/exec';
 let selectedRole = null;
 
 function selectRole(role) {
   selectedRole = role;
-  document.querySelectorAll('.role-card').forEach(c => c.style.borderWidth = '1.5px');
+  document.querySelectorAll('.role-card').forEach(c => {
+    c.style.borderWidth = '1.5px';
+    c.style.borderColor = '';
+  });
   const card = document.querySelector(`.role-card.${role}`);
   card.style.borderColor = role === 'supervisor' ? 'var(--teal)' : '#6B4FA0';
   card.style.borderWidth = '2px';
@@ -188,33 +188,77 @@ function selectRole(role) {
 }
 
 function login() {
-  const id = document.getElementById('idInput').value.trim().toUpperCase();
+  const gmail = document.getElementById('idInput').value.trim().toLowerCase();
   const err = document.getElementById('errorMsg');
 
-  if(!id) {
-    err.textContent = '⚠ 請輸入學號或員工編號';
+  if(!gmail) {
+    err.textContent = '⚠ 請輸入您的 Gmail';
     err.classList.add('show');
     return;
   }
 
-  // Demo logic
-  if(id.startsWith('PT') || (!id.startsWith('T') && selectedRole === 'student')) {
-    // Student
-    sessionStorage.setItem('pt-role', 'student');
-    sessionStorage.setItem('pt-id', id);
-    window.location.href = 'student.html';
-  } else if(id.startsWith('T') || selectedRole === 'supervisor') {
-    // Supervisor
-    sessionStorage.setItem('pt-role', 'supervisor');
-    sessionStorage.setItem('pt-id', id);
-    window.location.href = 'supervisor.html';
+  if(!gmail.includes('@')) {
+    err.textContent = '⚠ 請輸入完整的 Gmail（例：name@gmail.com）';
+    err.classList.add('show');
+    return;
+  }
+
+  if(!selectedRole) {
+    err.textContent = '⚠ 請先選擇身份（督導或學員）';
+    err.classList.add('show');
+    return;
+  }
+
+  // Show loading
+  const btn = document.querySelector('.id-btn');
+  btn.textContent = '驗證中…';
+  btn.disabled = true;
+  err.classList.remove('show');
+
+  // Verify with Google Sheets
+  const url = `${API_URL}?action=login&data=${encodeURIComponent(JSON.stringify({
+    gmail,
+    type: selectedRole === 'supervisor' ? 'supervisor' : 'student'
+  }))}&callback=handleLogin`;
+
+  const script = document.createElement('script');
+  script.src = url;
+  document.head.appendChild(script);
+
+  // Timeout fallback
+  setTimeout(() => {
+    if(btn.disabled) {
+      btn.textContent = '進入系統';
+      btn.disabled = false;
+      err.textContent = '⚠ 連線逾時，請再試一次';
+      err.classList.add('show');
+    }
+  }, 10000);
+}
+
+function handleLogin(result) {
+  const btn = document.querySelector('.id-btn');
+  const err = document.getElementById('errorMsg');
+  btn.textContent = '進入系統';
+  btn.disabled = false;
+
+  if(result.success) {
+    sessionStorage.setItem('pt-role', result.role);
+    sessionStorage.setItem('pt-name', result.name);
+    sessionStorage.setItem('pt-gmail', result.gmail);
+    if(result.currentStation) {
+      sessionStorage.setItem('pt-station', result.currentStation);
+    }
+    if(result.level) {
+      sessionStorage.setItem('pt-level', result.level);
+    }
+    window.location.href = result.role === 'supervisor' ? 'supervisor.html' : 'student.html';
   } else {
-    err.textContent = '⚠ 找不到此編號，請確認後重新輸入';
+    err.textContent = '⚠ ' + result.message;
     err.classList.add('show');
   }
 }
 
-// Enter key
 document.getElementById('idInput').addEventListener('keypress', e => {
   if(e.key === 'Enter') login();
 });

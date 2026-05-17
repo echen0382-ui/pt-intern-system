@@ -1088,9 +1088,64 @@ function sign(who) {
 function saveDraft() { showToast('💾 草稿已儲存'); }
 
 function submitForm() {
-  const epaDone = Object.keys(epaScores).length;
+  const epaDone = Object.keys(epaScores).filter(k=>!isNaN(parseInt(k))).length;
   if(epaDone < 5) { showToast('⚠️ EPA 尚有項目未填寫'); return; }
-  showToast('✅ 評核已送出！資料將同步至 E-portfolio');
+
+  const role = sessionStorage.getItem('pt-role');
+  const name = sessionStorage.getItem('pt-name') || '';
+  const station = sessionStorage.getItem('pt-station') || '神經站';
+
+  const metaInputs = document.querySelectorAll('.meta-input');
+  const data = {
+    studentName: role === 'student' ? name : (metaInputs[0]?.value || ''),
+    teacherName: role === 'supervisor' ? name : '',
+    station,
+    period: document.querySelector('input[name="period"]:checked')?.value || '',
+    level: document.querySelector('input[name="rank"]:checked')?.value || '',
+    caseId: document.querySelector('input[placeholder="後四碼或代號"]')?.value || '',
+    diagnosis: Array.from(document.querySelectorAll('.diag-tag.selected')).map(t=>t.textContent).join('、'),
+    epa1Overall: epaScores['o1'] || '',
+    epa2Overall: epaScores['o2'] || '',
+    epa3Overall: epaScores['o3'] || '',
+    praise: document.querySelectorAll('textarea')[0]?.value || '',
+    improve: document.querySelectorAll('textarea')[1]?.value || '',
+    actionPlan: document.querySelectorAll('textarea')[2]?.value || '',
+    studentReflection: document.querySelectorAll('textarea')[3]?.value || '',
+    studentSatisfaction: document.querySelector('#sat-student .sat-btn.sel')?.textContent || '',
+    teacherSatisfaction: document.querySelector('#sat-teacher .sat-btn.sel')?.textContent || '',
+    miniCEXSelected: modules.cex,
+    cbdSelected: modules.cbd,
+    techContent: Array.from(document.querySelectorAll('.tech-tag.selected')).map(t=>t.textContent.trim())
+  };
+
+  // Add EPA scores
+  Object.entries(epaScores).filter(([k])=>!isNaN(parseInt(k))).forEach(([k,v])=>{ data[`q${k}`]=v; });
+  if(modules.cex) Object.entries(cexScores).forEach(([k,v])=>{ data[`cex_q${k}`]=v; });
+  if(modules.cbd) Object.entries(cbdScores).forEach(([k,v])=>{ data[`cbd_q${parseInt(k)+1}`]=v; });
+
+  const btn = document.querySelector('.fs-btn');
+  btn.textContent = '儲存中…';
+
+  const script = document.createElement('script');
+  script.src = `${API_URL}?action=submitEPA&data=${encodeURIComponent(JSON.stringify(data))}&callback=handleSubmitResult`;
+  document.head.appendChild(script);
+
+  setTimeout(()=>{
+    if(btn.textContent==='儲存中…'){
+      btn.textContent='送出評核 →';
+      showToast('⚠️ 連線逾時，請再試一次');
+    }
+  }, 10000);
+}
+
+function handleSubmitResult(result) {
+  const btn = document.querySelector('.fs-btn');
+  btn.textContent = '送出評核 →';
+  if(result.success) {
+    showToast('✅ 評核已儲存至系統！');
+  } else {
+    showToast('⚠️ 儲存失敗：' + result.message);
+  }
 }
 
 function scrollTo(id) {
@@ -1103,6 +1158,8 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 2800);
 }
+
+const API_URL = 'https://script.google.com/macros/s/AKfycbzNfhZKb3aPIanHTyBKMRzQ9t1U2g7tRysm3o8HACHzTkAGfB64kCXfp-K854YfG9ew/exec';
 
 // ── INIT ──
 document.getElementById('evalDate').value = new Date().toISOString().split('T')[0];
