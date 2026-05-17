@@ -338,6 +338,7 @@ textarea:focus{outline:none;border-color:var(--teal);background:white;}
 <div class="main">
   <div class="topbar">
     <div class="topbar-left">
+      <a href="#" id="backBtn" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:white;color:var(--slate);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .18px" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='';this.style.color=''">← 返回</a>
       <div class="topbar-bc"><span>神經站</span> <strong>›</strong> <strong>整合式評核表單</strong></div>
       <div class="mode-pills">
         <button class="mode-pill supervisor active" onclick="setMode('supervisor',this)">👩‍⚕️ 督導</button>
@@ -1169,6 +1170,10 @@ renderCBD();
 renderTech();
 renderSat();
 updateFloatMod();
+
+// Set back button
+const _backBtn = document.getElementById('backBtn');
+if(_backBtn) _backBtn.href = _role === 'supervisor' ? 'supervisor.html' : 'student.html';
 
 // ── 根據登入身份鎖定欄位 ──
 const _role = sessionStorage.getItem('pt-role');

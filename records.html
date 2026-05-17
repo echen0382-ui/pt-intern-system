@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>評核紀錄 — PT實習通</title>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#0E7C7B;--teal-light:#1AA0A0;--teal-dark:#075E5E;
+  --cream:#F7F4EF;--warm:#FDFCFA;--charcoal:#1C2B2B;
+  --slate:#3D5555;--muted:#7A9090;
+  --accent:#E8A04A;--accent-bg:#FDF0DC;
+  --red:#D0575A;--red-bg:#FCE8E8;
+  --green:#2E9E6B;--green-bg:#E3F5ED;
+  --purple:#6B4FA0;--purple-bg:#F0EBF8;
+  --border:rgba(14,124,123,0.13);
+  --sidebar-w:240px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'M PLUS Rounded 1c',sans-serif;background:var(--cream);color:var(--charcoal);display:flex;min-height:100vh;}
+
+.sidebar{width:var(--sidebar-w);background:var(--charcoal);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-logo{padding:18px 16px 14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.sb-logo-icon{width:32px;height:32px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:13px;}
+.sb-logo-text{color:white;font-weight:700;font-size:15px;letter-spacing:2px;}
+.sb-user{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px;}
+.sb-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;flex-shrink:0;}
+.sb-user-name{color:white;font-size:13px;font-weight:700;}
+.sb-user-role{color:rgba(255,255,255,0.4);font-size:11px;margin-top:2px;}
+.sb-nav{padding:12px 10px;flex:1;}
+.sb-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);padding:0 6px;margin:10px 0 4px;}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;transition:all .15s;margin-bottom:2px;text-decoration:none;}
+.sb-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85);}
+.sb-item.active{background:rgba(14,124,123,0.3);color:white;}
+.sb-icon{font-size:15px;width:20px;text-align:center;}
+.sb-bottom{padding:14px 16px;border-top:1px solid rgba(255,255,255,0.08);}
+.sb-logout{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.35);font-size:12px;cursor:pointer;transition:color .15s;text-decoration:none;}
+.sb-logout:hover{color:rgba(255,255,255,0.7);}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:white;border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.back-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:white;color:var(--slate);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;text-decoration:none;}
+.back-btn:hover{border-color:var(--teal);color:var(--teal);}
+.topbar-title{font-weight:700;font-size:17px;}
+.topbar-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+.content{flex:1;overflow-y:auto;padding:24px 28px;}
+
+.filter-bar{background:white;border-radius:14px;border:1px solid var(--border);padding:16px 20px;margin-bottom:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.filter-label{font-size:12px;font-weight:700;color:var(--slate);}
+.filter-btn{padding:6px 14px;border-radius:100px;border:1.5px solid var(--border);background:white;color:var(--slate);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;}
+.filter-btn:hover{border-color:var(--teal);color:var(--teal);}
+.filter-btn.active{background:var(--teal);border-color:var(--teal);color:white;}
+.filter-btn.active-cex{background:var(--purple);border-color:var(--purple);color:white;}
+.filter-btn.active-cbd{background:var(--accent);border-color:var(--accent);color:white;}
+.search-input{padding:7px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--charcoal);background:var(--cream);margin-left:auto;width:200px;}
+.search-input:focus{outline:none;border-color:var(--teal);background:white;}
+
+.records-list{display:flex;flex-direction:column;gap:12px;}
+
+.record-card{background:white;border-radius:14px;border:1px solid var(--border);overflow:hidden;transition:box-shadow .2s;}
+.record-card:hover{box-shadow:0 4px 16px rgba(14,124,123,0.08);}
+
+.record-header{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;border-bottom:1px solid transparent;transition:border-color .18s;}
+.record-card.expanded .record-header{border-bottom-color:var(--border);}
+
+.record-type-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;flex-shrink:0;}
+.badge-epa{background:rgba(14,124,123,0.1);color:var(--teal-dark);}
+.badge-cex{background:var(--purple-bg);color:var(--purple);}
+.badge-cbd{background:var(--accent-bg);color:#8a5a10;}
+
+.record-info{flex:1;}
+.record-title{font-size:14px;font-weight:700;color:var(--charcoal);}
+.record-meta{font-size:11px;color:var(--muted);margin-top:3px;}
+
+.record-scores{display:flex;gap:8px;align-items:center;}
+.score-chip{font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;}
+.score-high{background:var(--green-bg);color:var(--green);}
+.score-mid{background:var(--accent-bg);color:#8a5a10;}
+.score-low{background:var(--red-bg);color:var(--red);}
+
+.record-chevron{font-size:16px;color:var(--muted);transition:transform .2s;}
+.record-card.expanded .record-chevron{transform:rotate(90deg);}
+
+.record-body{padding:16px 18px;display:none;}
+.record-card.expanded .record-body{display:block;}
+
+.record-detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.detail-item{background:var(--cream);border-radius:8px;padding:10px 12px;}
+.detail-label{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;text-transform:uppercase;}
+.detail-value{font-size:13px;font-weight:700;color:var(--charcoal);}
+
+.epa-scores-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.epa-score-item{background:var(--cream);border-radius:8px;padding:8px 10px;text-align:center;}
+.epa-score-num{font-size:16px;font-weight:700;color:var(--teal-dark);}
+.epa-score-label{font-size:9px;color:var(--muted);margin-top:2px;}
+
+.feedback-section{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.feedback-box{background:var(--cream);border-radius:10px;padding:12px 14px;}
+.feedback-box-label{font-size:11px;font-weight:700;margin-bottom:6px;}
+.feedback-box-label.praise{color:var(--green);}
+.feedback-box-label.improve{color:var(--accent);}
+.feedback-box-label.action{color:var(--charcoal);}
+.feedback-box-label.student{color:var(--purple);}
+.feedback-box-text{font-size:12px;color:var(--slate);line-height:1.7;}
+
+.student-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.stu-btn{padding:5px 12px;border-radius:100px;border:1.5px solid var(--border);background:white;color:var(--slate);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;}
+.stu-btn:hover{border-color:var(--teal);color:var(--teal);}
+.stu-btn.active{background:var(--teal);border-color:var(--teal);color:white;}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-icon{font-size:48px;margin-bottom:16px;}
+.empty-title{font-size:16px;font-weight:700;color:var(--slate);margin-bottom:8px;}
+.empty-sub{font-size:13px;}
+
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:14px;}
+
+.toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--charcoal);color:white;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none;}
+.toast.show{opacity:1;transform:none;}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .content{padding:16px;}
+  .record-detail-grid{grid-template-columns:1fr 1fr;}
+  .epa-scores-grid{grid-template-columns:repeat(2,1fr);}
+  .feedback-section{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">PT</div>
+    <span class="sb-logo-text">實習通</span>
+  </div>
+  <div class="sb-user">
+    <div class="sb-avatar" id="sbAvatar" style="background:var(--teal)">師</div>
+    <div>
+      <div class="sb-user-name" id="sbName">載入中…</div>
+      <div class="sb-user-role" id="sbRole">—</div>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-label">主選單</div>
+    <a class="sb-item" id="homeLink" href="#"><span class="sb-icon">🏠</span> 總覽儀表板</a>
+    <a class="sb-item" href="form-neuro.html"><span class="sb-icon">📋</span> 填寫評核表單</a>
+    <a class="sb-item active" href="records.html"><span class="sb-icon">📂</span> 評核紀錄</a>
+    <div class="sb-label">其他</div>
+    <a class="sb-item" href="#"><span class="sb-icon">📖</span> 學習護照</a>
+    <a class="sb-item" href="#"><span class="sb-icon">📍</span> 出勤紀錄</a>
+  </div>
+  <div class="sb-bottom">
+    <a class="sb-logout" href="index.html"><span>🚪</span> 登出</a>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="back-btn" id="backBtn" href="#">← 返回</a>
+      <div>
+        <div class="topbar-title">評核紀錄</div>
+        <div class="topbar-sub" id="topbarSub">載入中…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Student filter (supervisor only) -->
+    <div id="studentFilterWrap" style="display:none;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--slate);margin-bottom:8px">篩選學員：</div>
+      <div class="student-filter" id="studentFilter"></div>
+    </div>
+
+    <!-- Type filter -->
+    <div class="filter-bar">
+      <span class="filter-label">表單類型：</span>
+      <button class="filter-btn active" onclick="filterType('all',this)">全部</button>
+      <button class="filter-btn" onclick="filterType('epa',this)">EPA</button>
+      <button class="filter-btn" onclick="filterType('cex',this)">Mini-CEX</button>
+      <button class="filter-btn" onclick="filterType('cbd',this)">CbD</button>
+      <input class="search-input" type="text" placeholder="🔍 搜尋學員或站別…" oninput="filterSearch(this.value)">
+    </div>
+
+    <!-- Records -->
+    <div class="records-list" id="recordsList">
+      <div class="loading">⏳ 從資料庫載入紀錄中…</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbzNfhZKb3aPIanHTyBKMRzQ9t1U2g7tRysm3o8HACHzTkAGfB64kCXfp-K854YfG9ew/exec';
+
+const role = sessionStorage.getItem('pt-role');
+const name = sessionStorage.getItem('pt-name') || '';
+const gmail = sessionStorage.getItem('pt-gmail') || '';
+
+if(!role) window.location.href = 'index.html';
+
+// Setup UI based on role
+document.getElementById('sbName').textContent = name;
+document.getElementById('sbAvatar').textContent = name ? name[0] : '?';
+if(role === 'supervisor') {
+  document.getElementById('sbRole').textContent = '👩‍⚕️ 臨床指導老師';
+  document.getElementById('sbAvatar').style.background = 'var(--teal)';
+  document.getElementById('homeLink').href = 'supervisor.html';
+  document.getElementById('backBtn').href = 'supervisor.html';
+  document.getElementById('topbarSub').textContent = '所有學員的評核紀錄';
+  document.getElementById('studentFilterWrap').style.display = 'block';
+} else {
+  document.getElementById('sbRole').textContent = '🎓 實習學員';
+  document.getElementById('sbAvatar').style.background = 'var(--purple)';
+  document.getElementById('homeLink').href = 'student.html';
+  document.getElementById('backBtn').href = 'student.html';
+  document.getElementById('topbarSub').textContent = '我的評核紀錄';
+}
+
+// State
+let allRecords = [];
+let currentTypeFilter = 'all';
+let currentStudentFilter = 'all';
+let currentSearch = '';
+
+// Load records from Google Sheets
+function loadRecords() {
+  const action = role === 'supervisor' ? 'getSupervisorRecords' : 'getStudentRecords';
+  const data = JSON.stringify({ gmail, name });
+  const script = document.createElement('script');
+  script.src = `${API_URL}?action=${action}&data=${encodeURIComponent(data)}&callback=handleRecords`;
+  document.head.appendChild(script);
+
+  setTimeout(() => {
+    if(document.getElementById('recordsList').innerHTML.includes('載入中')) {
+      renderDemoRecords();
+    }
+  }, 5000);
+}
+
+function handleRecords(result) {
+  if(result.success) {
+    allRecords = result.records || [];
+    renderRecords();
+    if(role === 'supervisor') renderStudentFilter();
+  } else {
+    renderDemoRecords();
+  }
+}
+
+// Demo records for testing
+function renderDemoRecords() {
+  allRecords = [
+    {
+      type:'epa', date:'2026/04/15 14:32', student:'王小明', teacher:'陳指導老師',
+      station:'神經站', period:'期中', level:'UGY',
+      scores:{q1:'2a',q2:'2b',q3:'2a',q4:'3a',q5:'2b',q6:'2a',q7:'2b',q8:'2a',q9:'2b',q10:'2a',q11:'2b',q12:'2a',q13:'2b'},
+      epa1:'2b', epa2:'2a', epa3:'2b',
+      praise:'病史詢問有組織性，與病患溝通表現良好',
+      improve:'臨床判斷部分需加強，建議多練習問題清單整理',
+      action:'每週複習一個神經疾病個案的problem list整理',
+      studentReflection:'這次評核讓我更了解自己在臨床判斷上的不足，會加強練習。',
+      miniCEX:true, cbd:false,
+      cexScores:{q1:6,q2:5,q3:7,q4:5,q5:6,q6:5,q7:6},
+      techContent:'評估、神經誘發技巧/誘發動作訓練、步態訓練/行走訓練'
+    },
+    {
+      type:'cex', date:'2026/04/12 10:15', student:'林雅婷', teacher:'陳指導老師',
+      station:'神經站', period:'第2次', level:'UGY',
+      scores:{q1:7,q2:6,q3:8,q4:6,q5:7,q6:6,q7:7},
+      praise:'操作技巧熟練，病患安全意識佳',
+      improve:'衛教說明可以更簡潔清楚',
+      action:'練習用更簡單的語言解釋治療目的',
+      studentReflection:'需要加強和病患家屬的溝通技巧。',
+      techContent:'轉位訓練/移位訓練、坐姿/站姿平衡訓練、步態訓練/行走訓練'
+    },
+    {
+      type:'cbd', date:'2026/04/10 15:45', student:'陳建宏', teacher:'陳指導老師',
+      station:'神經站', caseType:'生理個案', complexity:'中',
+      scores:{q1:4,q2:5,q3:4,q4:5,q5:4,q6:5,q7:5},
+      praise:'案例分析邏輯清晰，問題清單完整',
+      improve:'居家運動計畫設計可更個別化',
+      action:'下次案例討論前先準備個別化衛教方案',
+      studentReflection:'對於複雜個案的處置邏輯有更深的體會。'
+    },
+    {
+      type:'epa', date:'2026/04/08 09:20', student:'王小明', teacher:'陳指導老師',
+      station:'神經站', period:'期初', level:'UGY',
+      scores:{q1:'1b',q2:'2a',q3:'1b',q4:'2a',q5:'2a',q6:'1b',q7:'2a',q8:'1b',q9:'2a',q10:'1b',q11:'2a',q12:'1b',q13:'2a'},
+      epa1:'2a', epa2:'1b', epa3:'2a',
+      praise:'學習態度積極，願意主動詢問',
+      improve:'評估技巧需要加強練習',
+      action:'每天觀摩督導的評估流程',
+      studentReflection:'第一次正式評核，學到很多！',
+      miniCEX:false, cbd:false
+    }
+  ];
+  renderRecords();
+  if(role === 'supervisor') renderStudentFilter();
+}
+
+function renderStudentFilter() {
+  const students = [...new Set(allRecords.map(r => r.student))];
+  const wrap = document.getElementById('studentFilter');
+  wrap.innerHTML = `<button class="stu-btn active" onclick="filterStudent('all',this)">全部學員</button>` +
+    students.map(s => `<button class="stu-btn" onclick="filterStudent('${s}',this)">${s}</button>`).join('');
+}
+
+function filterType(type, btn) {
+  currentTypeFilter = type;
+  document.querySelectorAll('.filter-btn').forEach(b => b.className = 'filter-btn');
+  btn.classList.add('active');
+  if(type==='cex') btn.classList.add('active-cex');
+  if(type==='cbd') btn.classList.add('active-cbd');
+  renderRecords();
+}
+
+function filterStudent(student, btn) {
+  currentStudentFilter = student;
+  document.querySelectorAll('.stu-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRecords();
+}
+
+function filterSearch(q) {
+  currentSearch = q.toLowerCase();
+  renderRecords();
+}
+
+function getFilteredRecords() {
+  return allRecords.filter(r => {
+    const myName = name;
+    // Student can only see their own records
+    if(role === 'student' && r.student !== myName) return false;
+    if(currentTypeFilter !== 'all' && r.type !== currentTypeFilter) return false;
+    if(currentStudentFilter !== 'all' && r.student !== currentStudentFilter) return false;
+    if(currentSearch) {
+      const searchStr = (r.student + r.teacher + r.station + r.date).toLowerCase();
+      if(!searchStr.includes(currentSearch)) return false;
+    }
+    return true;
+  });
+}
+
+function getScoreColor(score) {
+  if(typeof score === 'number') {
+    if(score >= 7) return 'score-high';
+    if(score >= 5) return 'score-mid';
+    return 'score-low';
+  }
+  if(typeof score === 'string') {
+    if(['4a','4b','5'].includes(score)) return 'score-high';
+    if(['3a','3b','3c'].includes(score)) return 'score-mid';
+    return 'score-low';
+  }
+  return '';
+}
+
+function renderRecords() {
+  const records = getFilteredRecords();
+  const container = document.getElementById('recordsList');
+
+  if(records.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <div class="empty-title">目前沒有評核紀錄</div>
+      <div class="empty-sub">符合篩選條件的紀錄將顯示在這裡</div>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = records.map((r, i) => {
+    const typeLabel = {epa:'EPA',cex:'Mini-CEX',cbd:'CbD'}[r.type];
+    const typeBadge = `badge-${r.type==='cex'?'cex':r.type}`;
+    const avgScore = r.type==='epa' ? (r.epa1||'—') :
+      r.type==='cex' ? (r.scores ? (Object.values(r.scores).filter(v=>v!=='na').reduce((a,b)=>a+b,0)/Object.values(r.scores).filter(v=>v!=='na').length).toFixed(1) : '—') :
+      r.scores ? (Object.values(r.scores).filter(v=>v!=='uc'&&v).reduce((a,b)=>a+b,0)/Object.values(r.scores).filter(v=>v!=='uc'&&v).length).toFixed(1) : '—';
+
+    return `<div class="record-card" id="card-${i}">
+      <div class="record-header" onclick="toggleCard(${i})">
+        <span class="record-type-badge ${typeBadge}">${typeLabel}</span>
+        <div class="record-info">
+          <div class="record-title">
+            ${role==='supervisor' ? r.student + ' · ' : ''}${r.station} · ${r.period||r.caseType||''}
+          </div>
+          <div class="record-meta">${r.date} · 督導：${r.teacher}</div>
+        </div>
+        <div class="record-scores">
+          <span class="score-chip ${getScoreColor(typeof avgScore==='string'?parseFloat(avgScore):avgScore)}">
+            ${r.type==='epa'?'整體 '+avgScore : '平均 '+avgScore}
+          </span>
+          ${r.miniCEX?'<span class="score-chip" style="background:var(--purple-bg);color:var(--purple)">+CEX</span>':''}
+          ${r.cbd?'<span class="score-chip" style="background:var(--accent-bg);color:#8a5a10">+CbD</span>':''}
+        </div>
+        <span class="record-chevron">›</span>
+      </div>
+      <div class="record-body">
+        <div class="record-detail-grid">
+          <div class="detail-item"><div class="detail-label">學員</div><div class="detail-value">${r.student||'—'}</div></div>
+          <div class="detail-item"><div class="detail-label">站別</div><div class="detail-value">${r.station||'—'}</div></div>
+          <div class="detail-item"><div class="detail-label">職級</div><div class="detail-value">${r.level||r.complexity||'—'}</div></div>
+        </div>
+
+        ${r.type==='epa' && r.scores ? `
+        <div style="font-size:12px;font-weight:700;color:var(--slate);margin-bottom:8px">EPA 各題評分</div>
+        <div class="epa-scores-grid">
+          ${Object.entries(r.scores).map(([k,v])=>`
+            <div class="epa-score-item">
+              <div class="epa-score-num" style="color:${['4a','4b','5'].includes(v)?'var(--green)':['3a','3b','3c'].includes(v)?'var(--accent)':'var(--red)'}">${v||'—'}</div>
+              <div class="epa-score-label">第${k.replace('q','')}題</div>
+            </div>`).join('')}
+          <div class="epa-score-item" style="background:rgba(14,124,123,0.08)">
+            <div class="epa-score-num" style="color:var(--teal-dark)">${r.epa1||'—'}</div>
+            <div class="epa-score-label">EPA1整體</div>
+          </div>
+          <div class="epa-score-item" style="background:rgba(107,79,160,0.08)">
+            <div class="epa-score-num" style="color:var(--purple)">${r.epa2||'—'}</div>
+            <div class="epa-score-label">EPA2整體</div>
+          </div>
+          <div class="epa-score-item" style="background:rgba(232,160,74,0.1)">
+            <div class="epa-score-num" style="color:#8a5a10">${r.epa3||'—'}</div>
+            <div class="epa-score-label">EPA3整體</div>
+          </div>
+        </div>` : ''}
+
+        ${r.type==='cex' && r.scores ? `
+        <div style="font-size:12px;font-weight:700;color:var(--slate);margin-bottom:8px">Mini-CEX 各項評分</div>
+        <div class="epa-scores-grid">
+          ${['醫療面談','身體檢查','臨床操作','諮商衛教','臨床判斷','組織效能','人道專業'].map((label,i)=>`
+            <div class="epa-score-item">
+              <div class="epa-score-num" style="color:${r.scores['q'+(i+1)]>=7?'var(--green)':r.scores['q'+(i+1)]>=5?'var(--accent)':'var(--red)'}">${r.scores['q'+(i+1)]||'—'}</div>
+              <div class="epa-score-label">${label}</div>
+            </div>`).join('')}
+        </div>
+        ${r.techContent?`<div style="margin-top:10px;padding:10px 12px;background:var(--purple-bg);border-radius:8px;font-size:12px;color:var(--purple)"><strong>技術內容：</strong>${r.techContent}</div>`:''}` : ''}
+
+        ${r.type==='cbd' && r.scores ? `
+        <div style="font-size:12px;font-weight:700;color:var(--slate);margin-bottom:8px">CbD 各項評分</div>
+        <div class="epa-scores-grid">
+          ${['病例記載','臨床評估','檢查關連','治療','追蹤計畫','專業','整體判斷'].map((label,i)=>`
+            <div class="epa-score-item">
+              <div class="epa-score-num" style="color:${r.scores['q'+(i+1)]>=5?'var(--green)':r.scores['q'+(i+1)]>=3?'var(--accent)':'var(--red)'}">${r.scores['q'+(i+1)]||'—'}</div>
+              <div class="epa-score-label">${label}</div>
+            </div>`).join('')}
+        </div>` : ''}
+
+        <div class="feedback-section">
+          <div class="feedback-box">
+            <div class="feedback-box-label praise">✦ 值得嘉許</div>
+            <div class="feedback-box-text">${r.praise||'—'}</div>
+          </div>
+          <div class="feedback-box">
+            <div class="feedback-box-label improve">▲ 可再精進</div>
+            <div class="feedback-box-text">${r.improve||'—'}</div>
+          </div>
+        </div>
+        ${r.action?`<div class="feedback-box" style="margin-bottom:10px">
+          <div class="feedback-box-label action">📋 共識行動</div>
+          <div class="feedback-box-text">${r.action}</div>
+        </div>`:''}
+        ${r.studentReflection?`<div class="feedback-box">
+          <div class="feedback-box-label student">🎓 學員心得</div>
+          <div class="feedback-box-text">${r.studentReflection}</div>
+        </div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCard(i) {
+  document.getElementById('card-'+i).classList.toggle('expanded');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// Load on start
+loadRecords();
+</script>
+</body>
+</html>
