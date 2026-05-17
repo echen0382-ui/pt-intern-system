@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>學員儀表板 — PT實習通</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --teal:#0E7C7B;--teal-light:#1AA0A0;--teal-dark:#075E5E;
@@ -18,13 +18,13 @@
   --sidebar-w:240px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Noto Sans TC',sans-serif;background:var(--cream);color:var(--charcoal);display:flex;min-height:100vh;}
+body{font-family:'M PLUS Rounded 1c', sans-serif;background:var(--cream);color:var(--charcoal);display:flex;min-height:100vh;}
 
 /* SIDEBAR */
 .sidebar{width:var(--sidebar-w);background:var(--charcoal);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
 .sb-logo{padding:18px 16px 14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid rgba(255,255,255,0.08);}
-.sb-logo-icon{width:32px;height:32px;background:var(--purple);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:13px;font-family:'DM Serif Display',serif;}
-.sb-logo-text{color:white;font-family:'Noto Serif TC',serif;font-weight:900;font-size:15px;letter-spacing:2px;}
+.sb-logo-icon{width:32px;height:32px;background:var(--purple);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:13px;font-family:'M PLUS Rounded 1c', sans-serif;}
+.sb-logo-text{color:white;font-family:'M PLUS Rounded 1c', sans-serif;font-weight:900;font-size:15px;letter-spacing:2px;}
 .sb-user{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px;}
 .sb-avatar{width:36px;height:36px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;flex-shrink:0;}
 .sb-user-name{color:white;font-size:13px;font-weight:700;}
@@ -43,7 +43,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--cream);color:var(--c
 /* MAIN */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .topbar{background:white;border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.topbar-title{font-family:'Noto Serif TC',serif;font-weight:900;font-size:17px;}
+.topbar-title{font-family:'M PLUS Rounded 1c', sans-serif;font-weight:900;font-size:17px;}
 .topbar-sub{font-size:12px;color:var(--muted);margin-top:2px;}
 .btn{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:none;transition:all .18s;display:inline-flex;align-items:center;gap:5px;}
 .btn-purple{background:var(--purple);color:white;}
@@ -58,11 +58,11 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--cream);color:var(--c
 .welcome-banner::after{content:'🎓';position:absolute;right:24px;bottom:-10px;font-size:80px;opacity:.15;}
 .welcome-text{}
 .welcome-greeting{color:rgba(255,255,255,0.75);font-size:13px;margin-bottom:4px;}
-.welcome-name{color:white;font-family:'Noto Serif TC',serif;font-weight:900;font-size:22px;}
+.welcome-name{color:white;font-family:'M PLUS Rounded 1c', sans-serif;font-weight:900;font-size:22px;}
 .welcome-detail{color:rgba(255,255,255,0.65);font-size:12px;margin-top:6px;}
 .welcome-stats{display:flex;gap:20px;position:relative;z-index:1;}
 .welcome-stat{text-align:center;}
-.welcome-stat-num{font-family:'DM Serif Display',serif;font-size:28px;color:white;line-height:1;}
+.welcome-stat-num{font-family:'M PLUS Rounded 1c', sans-serif;font-size:28px;color:white;line-height:1;}
 .welcome-stat-label{font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px;}
 
 /* STAT CARDS */
@@ -74,7 +74,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--cream);color:var(--c
 .stat-card.amber::after{background:var(--accent);}
 .stat-card.green::after{background:var(--green);}
 .stat-icon{font-size:20px;margin-bottom:8px;}
-.stat-num{font-family:'DM Serif Display',serif;font-size:28px;line-height:1;color:var(--charcoal);}
+.stat-num{font-family:'M PLUS Rounded 1c', sans-serif;font-size:28px;line-height:1;color:var(--charcoal);}
 .stat-label{font-size:11px;color:var(--muted);margin-top:4px;}
 .stat-sub{font-size:11px;font-weight:600;margin-top:6px;}
 
@@ -135,7 +135,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--cream);color:var(--c
 /* ATTEND CARD */
 .attend-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
 .attend-item{background:var(--cream);border-radius:10px;padding:12px;text-align:center;}
-.attend-num{font-family:'DM Serif Display',serif;font-size:24px;color:var(--charcoal);}
+.attend-num{font-family:'M PLUS Rounded 1c', sans-serif;font-size:24px;color:var(--charcoal);}
 .attend-label{font-size:10px;color:var(--muted);margin-top:3px;}
 .attend-item.warn .attend-num{color:var(--red);}
 
